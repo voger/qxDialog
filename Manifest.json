@@ -1,0 +1,36 @@
+{
+ "$schema": "https://qooxdoo.org/schema/Manifest-1-0-0.json",
+  "info" :
+  {
+    "name" : "qxDialogs",
+
+    "summary" : "A bunch of dialogs for the Qooxdoo framework",
+    "description" : "",
+
+    "homepage" : "",
+
+    "license" : "MIT license",
+    "authors" : [
+  {
+    "name": "",
+    "email": "voger"
+  }
+],
+
+    "version" : "0.0.1"
+  },
+
+  "provides" :
+  {
+    "namespace"   : "qxDialogs",
+    "encoding"    : "utf-8",
+    "class"       : "source/class",
+    "resource"    : "source/resource",
+    "translation" : "source/translation"
+  },
+
+  "requires": {
+    "@qooxdoo/framework": "^6.0.0-beta-20201223-1121",
+    "@qooxdoo/compiler" : "^1.0.0-beta-20201223-1121"
+  }
+}
