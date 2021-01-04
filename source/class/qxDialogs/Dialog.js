@@ -114,19 +114,17 @@ qx.Class.define("qxDialogs.Dialog", {
     this.addListener("appear", this.__block, this);
     this.addListener("close", this.__unblock, this);
 
-    this.addListener("appear", this.__center, this);
+    this.addListener("appear", this.center, this);
   },
 
   members: {
     __blocker: null,
 
-    __block: function () {
-      if (this.getModal()) {
-        this.__blocker.block();
-      }
-    },
-
-    __center: function () {
+    /**
+     * Centers the dialog to the blocked widget
+     *
+     */
+    center: function () {
       const {
         height: targetHeight,
         width: targetWidth,
@@ -140,6 +138,13 @@ qx.Class.define("qxDialogs.Dialog", {
       const top = Math.round((targetHeight - dialogHeight) / 2);
       this.moveTo(left, top);
     },
+
+    __block: function () {
+      if (this.getModal()) {
+        this.__blocker.block();
+      }
+    },
+
 
     __unblock: function () {
       this.__blocker.unblock();
