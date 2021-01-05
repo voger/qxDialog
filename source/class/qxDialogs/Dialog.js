@@ -1,99 +1,165 @@
 qx.Class.define("qxDialogs.Dialog", {
   extend: qx.ui.window.Window,
 
+  events: {
+    /**
+     * Emmited when the color of the blocker changes
+     *
+     */
+    changeBlockerColor: "qx.event.type.Data",
+
+    /**
+     * Emmited when the blocker opacity changes
+     *
+     */
+    changeBlockerOpacity: "qx.event.type.Data",
+
+    /**
+     * Emmited when the dialog is closed with `accepted` or `rejected`.
+     * By default calling `getData()` on this event returns `undefined`.
+     * Set a function to the property `onDone` to return something meaningful.
+     *
+     */
+    "done": "qx.event.type.Data",
+
+    /**
+     * Emited when the dialog is closed with `accepted`.
+     * By default calling `getData()` on this event returns `undefined`.
+     * Set a function to the property `onAccepted` to return something meaningful.
+     *
+     */
+    "accepted": "qx.event.type.Data",
+
+    /**
+     * Emited when the dialog is closed with `rejected`.
+     * By default calling `getData()` on this event returns `undefined`.
+     * Set a function to the property `onRejected` to return something meaningful.
+     *
+     */
+    "rejected": "qx.event.type.Data"
+  },
+
   properties: {
+    onAccepted: {
+      check: "Function",
+      init: () => {
+        return;
+      },
+      nullable: false
+    },
+
+    onRejected: {
+      check: "Function",
+      init: () => {
+        return;
+      },
+      nullable: false
+    },
+
+    onDone: {
+      check: "Function",
+      init: () => {
+        return;
+      },
+      nullable: false
+    },
+
     useBlocker: {
-      check: "Boolean",
+      check: "Boolean"
     },
 
     blockerColor: {
       init: "qxDialogs.blocker",
       nullable: false,
-      event: "changeBlockerColor",
+      event: "changeBlockerColor"
     },
 
     blockerOpacity: {
       check: "Number",
       init: 0.2,
       nullable: false,
-      event: "changeBlockerOpacity",
+      event: "changeBlockerOpacity"
     },
 
-    blockedItem: {
+    /**
+     * The parent widget. Defaults to application root
+     *
+     */
+    parent: {
       check: "qx.ui.core.LayoutItem",
       nullable: false,
-      deferredInit: true,
+      deferredInit: true
     },
 
     // overrides
     visibility: {
       refine: true,
-      init: "hidden",
+      init: "hidden"
     },
 
     allowClose: {
       refine: true,
-      init: false,
+      init: false
     },
 
     allowMinimize: {
       refine: true,
-      init: false,
+      init: false
     },
 
     allowMaximize: {
       refine: true,
-      init: false,
+      init: false
     },
 
     alwaysOnTop: {
       refine: true,
-      init: true,
+      init: true
     },
 
     modal: {
       refine: true,
-      init: true,
+      init: true
     },
 
     resizableTop: {
       refine: true,
-      init: false,
+      init: false
     },
 
     resizableLeft: {
       refine: true,
-      init: false,
+      init: false
     },
 
     resizableRight: {
       refine: true,
-      init: false,
+      init: false
     },
 
     resizableBottom: {
       refine: true,
-      init: false,
+      init: false
     },
     showClose: {
       refine: true,
-      init: false,
+      init: false
     },
 
     showMaximize: {
       refine: true,
-      init: false,
+      init: false
     },
 
     showMinimize: {
       refine: true,
-      init: false,
+      init: false
     },
 
     showStatusbar: {
       refine: true,
-      init: false,
-    },
+      init: false
+    }
   },
 
   construct: function (content, blockedItem) {
@@ -127,12 +193,10 @@ qx.Class.define("qxDialogs.Dialog", {
     center: function () {
       const {
         height: targetHeight,
-        width: targetWidth,
+        width: targetWidth
       } = this.getBlockedItem().getBounds();
 
-      const { height: dialogHeight, width: dialogWidth } = this.getSizeHint(
-        true
-      );
+      const {height: dialogHeight, width: dialogWidth} = this.getSizeHint(true);
 
       const left = Math.round((targetWidth - dialogWidth) / 2);
       const top = Math.round((targetHeight - dialogHeight) / 2);
@@ -145,9 +209,8 @@ qx.Class.define("qxDialogs.Dialog", {
       }
     },
 
-
     __unblock: function () {
       this.__blocker.unblock();
-    },
-  },
+    }
+  }
 });
