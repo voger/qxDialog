@@ -1,5 +1,6 @@
 {
   "name": "qxdialogs",
+  "private": true,
   "version": "1.0.0",
   "description": "A bunch of dialogs for the Qooxdoo framework",
   "main": "index.js",
