@@ -8,5 +8,6 @@ module.exports = {
         "ecmaVersion": 12
     },
     "rules": {
+      no-undef: off
     }
 };
