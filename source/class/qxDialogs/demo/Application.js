@@ -47,24 +47,15 @@ qx.Class.define("qxDialogs.demo.Application",
       -------------------------------------------------------------------------
       */
 
-      // Create a button
-      var button1 = new qx.ui.form.Button("Very special button", "qxDialogs/test.png");
-      
-      var dialog = new qxDialogs.Dialog().set({
-        useBlocker: true,
-        modal: true
-      });
-
       // Document is the application root
       var doc = this.getRoot();
 
-      // Add button to document at fixed coordinates
-      doc.add(button1, {left: 100, top: 50});
+      const buttonBox = new qxDialogs.ButtonBox();
 
-      // Add an event listener
-      button1.addListener("execute", function(e) {
-        dialog.show();
-      });
+      buttonBox.addButton(new qx.ui.form.Button("Test"), qxDialogs.ButtonBox.roles.ACCEPT);
+
+      doc.add(buttonBox, {top: 100, left: 100});
+
     }
   }
 });

@@ -16,33 +16,17 @@ qx.Class.define("qxDialogs.ButtonBox", {
     },
 
     buttonsLayout: {
-      nullable: false,
-      init: {
-        horizontal: [
-          this.constructor.roles.RESET,
-          this.constructor.roles.SPACER,
-          this.constructor.roles.YES,
-          this.constructor.roles.ACCEPT,
-          this.constructor.roles.DESTRUCTIVE,
-          this.constructor.roles.NO,
-          this.constructor.roles.ACTION,
-          this.constructor.roles.REJECT,
-          this.constructor.roles.APPLY,
-          this.constructor.roles.HELP
-        ],
-        vertical: [
-          this.constructor.roles.ACTION,
-          this.constructor.roles.YES,
-          this.constructor.roles.ACCEPT,
-          this.constructor.roles.DESTRUCTIVE,
-          this.constructor.roles.NO,
-          this.constructor.roles.REJECT,
-          this.constructor.roles.APPLY,
-          this.constructor.roles.RESET,
-          this.constructor.roles.HELP,
-          this.constructor.roles.SPACER
-        ]
-      }
+      nullable: true
+    },
+
+    allowGrowX: {
+      refine: true,
+      init: true
+    },
+
+    allowGrowY: {
+      refine: true,
+      init: true
     }
   },
 
@@ -85,7 +69,10 @@ qx.Class.define("qxDialogs.ButtonBox", {
     }
   },
 
-  constructor: function () {
+  construct: function () {
+    this.base(arguments);
+
+    this.initOrientation();
     this.__standardButtons = new Map();
     this.__initButtonLists();
   },
@@ -123,10 +110,12 @@ qx.Class.define("qxDialogs.ButtonBox", {
         // and that string is the button's label.
         this.__createButtonFromString(button.toString(), role);
       }
+
+      this.layoutButtons();
     },
 
     __addButton: function (button, role) {
-      if (!qx.lang.Object.contains(roles)) {
+      if (!qx.lang.Object.contains(this.constructor.roles, role)) {
         this.warn(`Role ${role} is invalid. Button not added`);
         return;
       }
@@ -139,7 +128,10 @@ qx.Class.define("qxDialogs.ButtonBox", {
 
     __createButtonFromString: function (label, role) {
       const button = new qx.ui.form.Button(label);
-      this.add(button, role);
+
+      const roleArray = this.__buttonLists.get(role);
+      roleArray.push(button);
+
       return button;
     },
 
@@ -162,15 +154,24 @@ qx.Class.define("qxDialogs.ButtonBox", {
       return button;
     },
 
+    /**
+     * Clears the buttons from the container but doesn't delete them from the internal list
+     * @return the removed buttons
+     */
+    clearButtons: function () {
+      return this.removeAll();
+    },
+
     layoutButtons: function () {
       if (this.getCenter()) {
         this.add(new qx.ui.core.Spacer());
       }
 
       const roles = this.constructor.roles;
-      const buttonsLayout = this.getButtonsLaout()[this.getOrientation()];
+      const buttonsLayout = (this.getButtonsLayout() ||
+        this._defaultButtonsLayout())[this.getOrientation()];
 
-      for (role in buttonsLayout) {
+      for (const role of buttonsLayout) {
         switch (role) {
           case roles.SPACER:
             if (!this.getCenter()) {
@@ -180,7 +181,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
           case roles.ACCEPT:
             // only add the first button
             const button = this.__buttonLists.get(role)[0];
-            button && this.addButton();
+            button && this.add(button);
 
             break;
           case roles.DESTRUCTIVE:
@@ -205,17 +206,16 @@ qx.Class.define("qxDialogs.ButtonBox", {
       let newLayout;
 
       if ("horizontal" === val) {
-        newLayout = new qx.ui.layout.HBox();
+        this.setLayout(new qx.ui.layout.HBox());
       } else {
-        newLayout = new qx.ui.layout.VBox();
+        this.setLayout(new qx.ui.layout.VBox());
       }
-      this.setLayout(newLayout);
-      oldLayout.dispose();
+      oldLayout && oldLayout.dispose();
     },
 
     __addButtons: function (buttonsArr) {
-      for (button in buttonsArr) {
-        this.add(buton);
+      for (const button of buttonsArr) {
+        this.add(button);
       }
     },
 
@@ -332,9 +332,38 @@ qx.Class.define("qxDialogs.ButtonBox", {
     __initButtonLists: function () {
       const buttonLists = (this.__buttonLists = new Map());
 
-      for (key in this.constructor.standardButtons.keys) {
+      for (const key in this.constructor.roles) {
         buttonLists.set(key, []);
       }
+    },
+
+    _defaultButtonsLayout() {
+      return {
+        horizontal: [
+          this.constructor.roles.RESET,
+          this.constructor.roles.SPACER,
+          this.constructor.roles.YES,
+          this.constructor.roles.ACCEPT,
+          this.constructor.roles.DESTRUCTIVE,
+          this.constructor.roles.NO,
+          this.constructor.roles.ACTION,
+          this.constructor.roles.REJECT,
+          this.constructor.roles.APPLY,
+          this.constructor.roles.HELP
+        ],
+        vertical: [
+          this.constructor.roles.ACTION,
+          this.constructor.roles.YES,
+          this.constructor.roles.ACCEPT,
+          this.constructor.roles.DESTRUCTIVE,
+          this.constructor.roles.NO,
+          this.constructor.roles.REJECT,
+          this.constructor.roles.APPLY,
+          this.constructor.roles.RESET,
+          this.constructor.roles.HELP,
+          this.constructor.roles.SPACER
+        ]
+      };
     }
   }
 });
