@@ -2,21 +2,29 @@ qx.Class.define("qxDialogs.ButtonBox", {
   extend: qx.ui.container.Composite,
 
   properties: {
+    /**
+     * Orientation of the widget.
+     * Can be "horizontal" or "vertical".
+     * Default "horizontal"
+     *
+     */
     orientation: {
       nullable: false,
       check: ["horizontal", "vertical"],
-      init: "horizontal",
+      deferredInit: true,
       apply: "_applyOrientation"
     },
 
     center: {
       nullable: false,
       check: "Boolean",
-      init: false
+      init: false,
+      apply: "_applyCenter"
     },
 
     buttonsLayout: {
-      nullable: true
+      nullable: true,
+      apply: "_applyButtonsLayout"
     },
 
     allowGrowX: {
@@ -27,6 +35,11 @@ qx.Class.define("qxDialogs.ButtonBox", {
     allowGrowY: {
       refine: true,
       init: true
+    },
+
+    focusable: {
+      refine: true,
+      init: false
     }
   },
 
@@ -69,24 +82,37 @@ qx.Class.define("qxDialogs.ButtonBox", {
     }
   },
 
-  construct: function () {
+  /**
+   * Constructs a new qxDialogs.ButtonBox.
+   * @param buttonsArr {Array} Optional. An array of standard buttons to create
+   *                           for convinience.
+   */
+  construct: function (buttonsArr = [], orientation = "horizontal") {
     this.base(arguments);
 
-    this.initOrientation();
     this.__standardButtons = new Map();
     this.__initButtonLists();
+
+    this.initOrientation(orientation);
+    this.__createStandardButtons(buttonsArr);
   },
 
   members: {
-    __standardButtons: null,
+    _forwardStates: {
+      focused: true
+    },
 
+    // contains all the buttons of this widget
     __buttonLists: null,
+
+    // contains only the standard buttons
+    __standardButtons: null,
 
     /**
      * Adds a button. Button can be:
      * * {String} In this case a new qx.ui.form.Button is created and the
      *            string serves as it's label.
-     * *
+     *
      *
      * @param button  The button to be added
      * @param role {qxDialog.ButtonBox.roles} one of the ButtonBox roles
@@ -105,13 +131,9 @@ qx.Class.define("qxDialogs.ButtonBox", {
         // The `role` method param is ignored. Standard buttons have
         // predefined roles.
         this.__createStandardButton(button);
-      } else {
-        // In any other case the `button` param is handled as a string
-        // and that string is the button's label.
-        this.__createButtonFromString(button.toString(), role);
       }
 
-      this.layoutButtons();
+      this.__resetButtonsLayout();
     },
 
     __addButton: function (button, role) {
@@ -120,38 +142,80 @@ qx.Class.define("qxDialogs.ButtonBox", {
         return;
       }
 
-      const roleArray = this.__buttonLists.get(role);
-      roleArray.push(button);
-
-      return button;
-    },
-
-    __createButtonFromString: function (label, role) {
-      const button = new qx.ui.form.Button(label);
+      button.addListener("execute", this.__handleButtonExecute, this);
 
       const roleArray = this.__buttonLists.get(role);
       roleArray.push(button);
-
       return button;
     },
 
     /**
      * Creates a standard button.
-     * @param standardButton {String} one of the entries in standard
-     * buttons from this class
-     * @return {qx.ui.form.Button} the created button
+     * @param sButton {String} one of the entries in standard
+     * buttons enum from this class
      */
-    __createStandardButton: function (standardButton) {
-      const buttonText = this._standardButtonText(standardButton);
+    __createStandardButton: function (sButton) {
+      // there this standard button is already created
+      // do nothing
+      if ([...this.__standardButtons.values()].includes(sButton)) {
+        return;
+      }
+
+      const buttonText = this.__standardButtonText(sButton);
       const button = new qx.ui.form.Button(buttonText);
 
-      this.__standardButtons.set(button.standardButton);
-
-      const role = this.__buttonRole(standardButton);
+      this.__standardButtons.set(button, sButton);
+      const role = this.__buttonRole(sButton);
 
       this.__addButton(button, role);
+    },
 
+    __createStandardButtons: function (buttonsArr) {
+      for (const standardButton of buttonsArr) {
+        this.addButton(standardButton);
+      }
+    },
+
+    /**
+     * Removes a button.
+     * @param button {qx.ui.form.Button}
+     *
+     * @return {qx.ui.form.Button}
+     *
+     */
+    removeButton: function (button) {
+      button.removeListener("execute", this.__handleButtonExecute, this);
+
+      const isStandard = this.__standardButtons.delete(button);
+
+      for (const role of this.__buttonLists.values()) {
+        qx.lang.Array.remove(role, button);
+      }
+
+      this.__resetButtonsLayout();
+
+      // If the button is a standardButton, we are responsible for it's
+      // disposal and we don't have to return anything. Otherwise return
+      // it as it is and let the caller decide what to do with it.
+      if (isStandard) {
+        button.dispose();
+        return;
+      }
       return button;
+    },
+
+    /**
+     * Removes a standard button
+     *
+     * @param button {String} One of the standardButtons values
+     */
+    removeStandardButton: function (sButton) {
+      for (const [button, value] of this.__standardButtons.entries()) {
+        if (value === sButton) {
+          this.removeButton(button);
+          return;
+        }
+      }
     },
 
     /**
@@ -159,7 +223,61 @@ qx.Class.define("qxDialogs.ButtonBox", {
      * @return the removed buttons
      */
     clearButtons: function () {
-      return this.removeAll();
+      return this.removeAll().filter((item) => {
+        // filter out any spacers from the return.
+        return !(item instanceof qx.ui.core.Spacer);
+      });
+    },
+
+    /**
+     * Returns all the child buttons
+     *
+     * @return {Array} A list of the buttons
+     */
+    buttons: function () {
+      let buttons = [];
+
+      for (const value of this.__buttonLists.values()) {
+        buttons = buttons.concat(value);
+      }
+
+      // ensure unique elements
+      return [...new Set(buttons)];
+    },
+
+    /**
+     * Returns the standard button enum value corresponding to the given button, or NOBUTTON if the given button
+     * is not a standard button.
+     *
+     * @param button {qx.ui.form.Button}
+     */
+    standardButton: function (button) {
+      return this.__standardButtons.get(button) || this.constructor.NOBUTTON;
+    },
+
+    /**
+     * Return a list of standard buttons used
+     *
+     * @return {Array} A list of standardButtons enum values used.
+     */
+    standardButtons: function () {
+      return [...this.__standardButtons.values()];
+    },
+
+    /**
+     * Return role for button
+     *
+     * @param {qx.ui.form.Button} The button for which we seek the role
+     * @return {String} the role
+     */
+    buttonRole: function (button) {
+      for (const [role, buttons] of this.__buttonLists.entries()) {
+        if (buttons.includes(button)) {
+          return role;
+        }
+      }
+
+      return this.constructor.role.INVALID;
     },
 
     layoutButtons: function () {
@@ -175,7 +293,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
         switch (role) {
           case roles.SPACER:
             if (!this.getCenter()) {
-              this.add(new qx.ui.core.Spacer());
+              this.add(new qx.ui.core.Spacer(), {flex: 1});
             }
             break;
           case roles.ACCEPT:
@@ -201,6 +319,10 @@ qx.Class.define("qxDialogs.ButtonBox", {
       }
     },
 
+    _applyCenter: function (val) {
+      this.__resetButtonsLayout();
+    },
+
     _applyOrientation: function (val) {
       const oldLayout = this.getLayout();
       let newLayout;
@@ -211,12 +333,27 @@ qx.Class.define("qxDialogs.ButtonBox", {
         this.setLayout(new qx.ui.layout.VBox());
       }
       oldLayout && oldLayout.dispose();
+      this.__resetButtonsLayout();
+    },
+
+    _applyLayout: function (val, old, name) {
+      this.base(arguments, val, old, name);
+      this.__resetButtonsLayout();
+    },
+
+    _applyButtonsLayout: function () {
+      this.__resetButtonsLayout();
     },
 
     __addButtons: function (buttonsArr) {
       for (const button of buttonsArr) {
         this.add(button);
       }
+    },
+
+    __resetButtonsLayout() {
+      this.clearButtons();
+      this.layoutButtons();
     },
 
     __buttonRole: function (sbutton) {
@@ -264,7 +401,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
       return role;
     },
 
-    _defaultStandardButtonText(sbutton) {
+    __standardButtonText(sbutton) {
       const sbuttons = this.constructor.standardButtons;
       let text;
       switch (sbutton) {
@@ -334,6 +471,26 @@ qx.Class.define("qxDialogs.ButtonBox", {
 
       for (const key in this.constructor.roles) {
         buttonLists.set(key, []);
+      }
+    },
+
+    __handleButtonExecute: function (event) {
+      const button = event.getTarget();
+
+      this.fireDataEvent("clicked", button);
+
+      const roles = this.constructor.roles;
+      switch (this.__buttonRole(button)) {
+        case roles.ACCEPT:
+        case roles.YES:
+          this.fireEvent("accepted");
+          break;
+        case roles.REJECT:
+        case roles.NO:
+          this.fireEvent("rejected");
+          break;
+        default:
+          break;
       }
     },
 

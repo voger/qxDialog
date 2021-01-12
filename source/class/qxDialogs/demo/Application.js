@@ -11,9 +11,8 @@
 /**
  * This is the main application class of "qxDialogs"
  */
-qx.Class.define("qxDialogs.demo.Application",
-{
-  extend : qx.application.Standalone,
+qx.Class.define("qxDialogs.demo.Application", {
+  extend: qx.application.Standalone,
 
   /*
   *****************************************************************************
@@ -21,15 +20,14 @@ qx.Class.define("qxDialogs.demo.Application",
   *****************************************************************************
   */
 
-  members :
-  {
+  members: {
     /**
-     * This method contains the initial application code and gets called 
+     * This method contains the initial application code and gets called
      * during startup of the application
-     * 
+     *
      * @lint ignoreDeprecated(alert)
      */
-    main : function() {
+    main: function () {
       // Call super class
       this.base(arguments);
 
@@ -50,12 +48,38 @@ qx.Class.define("qxDialogs.demo.Application",
       // Document is the application root
       var doc = this.getRoot();
 
-      const buttonBox = new qxDialogs.ButtonBox();
+      const buttonsEnum = qxDialogs.ButtonBox.standardButtons;
 
-      buttonBox.addButton(new qx.ui.form.Button("Test"), qxDialogs.ButtonBox.roles.ACCEPT);
+      const standardButtons = [
+        buttonsEnum.HELP,
+        buttonsEnum.YES,
+        buttonsEnum.NO
+      ];
+
+      const buttonBox = new qxDialogs.ButtonBox(standardButtons).set({
+        minWidth: 500
+      });
+
+      buttonBox.addButton(
+        new qx.ui.form.Button("Test"),
+        qxDialogs.ButtonBox.roles.RESET
+      );
+
+      const addApplyButton = new qx.ui.form.Button("Add Apply button");
+      addApplyButton.addListener("execute", function() {
+        buttonBox.addButton(buttonsEnum.APPLY);
+      }, this);
+
+      const removeApplyButton = new qx.ui.form.Button("Remove Apply button");
+      removeApplyButton.addListener("execute", function(){
+        buttonBox.removeStandardButton(buttonsEnum.APPLY);
+      },this);
+
 
       doc.add(buttonBox, {top: 100, left: 100});
 
+      doc.add(addApplyButton, {top: 150, left: 100});
+      doc.add(removeApplyButton, {top: 150, left: 200});
     }
   }
 });
