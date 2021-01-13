@@ -43,6 +43,32 @@ qx.Class.define("qxDialogs.ButtonBox", {
     }
   },
 
+  events: {
+    /**
+     * The event is fired when one of the buttons is clicked.
+     *
+     * The method {@link qx.event.type.Data#getData} returns the
+     * clicked button instance.
+     *
+     */
+
+    "clicked": "qx.event.type.Data",
+
+    /**
+     * The event if fired when one of the buttons with YES or ACCEPT
+     * roles is clicked.
+     *
+     */
+    "accepted": "qx.event.type.Event",
+
+    /**
+     * Te event if fired when onte of the button with NO or REJECT
+     * roles is clicked.
+     *
+     */
+    "rejected": "qx.event.type.Event"
+  },
+
   statics: {
     roles: {
       INVALID: "INVALID", // The button is invalid.
