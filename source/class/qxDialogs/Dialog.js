@@ -40,6 +40,10 @@ qx.Class.define("qxDialogs.Dialog", {
   },
 
   properties: {
+    /**
+     * Callback function when the dialog is accepted.
+     *
+     */
     onAccepted: {
       check: "Function",
       init: () => {
@@ -48,6 +52,10 @@ qx.Class.define("qxDialogs.Dialog", {
       nullable: false
     },
 
+    /**
+     * Callback function when the dialog is rejected.
+     *
+     */
     onRejected: {
       check: "Function",
       init: () => {
@@ -56,6 +64,10 @@ qx.Class.define("qxDialogs.Dialog", {
       nullable: false
     },
 
+    /**
+     * Callback function when the dialog is closed.
+     *
+     */
     onDone: {
       check: "Function",
       init: () => {
