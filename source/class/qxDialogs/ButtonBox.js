@@ -2,6 +2,11 @@ qx.Class.define("qxDialogs.ButtonBox", {
   extend: qx.ui.container.Composite,
 
   properties: {
+    appearance: {
+      refine: true,
+      init: "qxdialogs-buttonBox"
+    },
+
     /**
      * Orientation of the widget.
      * Can be "horizontal" or "vertical".
@@ -22,9 +27,38 @@ qx.Class.define("qxDialogs.ButtonBox", {
       apply: "_applyCenter"
     },
 
+    /**
+     * A map holding prefered layouts for horizontal
+     * and vertical orientation.
+     *
+     */
     buttonsLayout: {
       nullable: true,
       apply: "_applyButtonsLayout"
+    },
+
+    /**
+     * The distance between the buttons
+     *
+     */
+    buttonsDistance: {
+      nullable: false,
+      init: 5,
+      check: "Integer",
+      themeable: true,
+      apply: "_applyButtonsDistance"
+    },
+
+    /**
+     * Minimum width for the buttons.
+     * Used only in horizontal orientation.
+     * Has no effect in vertical orientation.
+     */
+    buttonMinWidth: {
+      nullable: true,
+      check: "Integer",
+      themeable: true,
+      apply: "_applyButtonMinWidth"
     },
 
     allowGrowX: {
@@ -170,6 +204,10 @@ qx.Class.define("qxDialogs.ButtonBox", {
 
       button.addListener("execute", this.__handleButtonExecute, this);
 
+      if (this.getLayout() instanceof qx.ui.layout.HBox) {
+        button.setMinWidth(this.getButtonMinWidth());
+      }
+
       const roleArray = this.__buttonLists.get(role);
       roleArray.push(button);
       return button;
@@ -218,7 +256,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
         qx.lang.Array.remove(role, button);
       }
 
-      this.__resetButtonsLayout();
+      this.remove(button);
 
       // If the button is a standardButton, we are responsible for it's
       // disposal and we don't have to return anything. Otherwise return
@@ -349,21 +387,40 @@ qx.Class.define("qxDialogs.ButtonBox", {
       this.__resetButtonsLayout();
     },
 
+    _applyButtonsDistance: function (val) {
+      const layout = this.getLayout();
+      layout.setSpacing(val);
+    },
+
+    _applyButtonMinWidth: function (val) {
+      const layout = this.getLayout();
+
+      const minWidth = this.getOrientation() === "horizontal" ? val : null;
+
+      for (const buttonsArr of this.__buttonLists.values()) {
+        for (const button of buttonsArr) {
+          button.setMinWidth(minWidth);
+        }
+      }
+    },
+
     _applyOrientation: function (val) {
       const oldLayout = this.getLayout();
       let newLayout;
 
+      const buttonsDistance = this.getButtonsDistance();
+
       if ("horizontal" === val) {
-        this.setLayout(new qx.ui.layout.HBox());
+        this.setLayout(new qx.ui.layout.HBox(buttonsDistance));
       } else {
-        this.setLayout(new qx.ui.layout.VBox());
+        this.setLayout(new qx.ui.layout.VBox(buttonsDistance));
       }
       oldLayout && oldLayout.dispose();
-      this.__resetButtonsLayout();
-    },
 
-    _applyLayout: function (val, old, name) {
-      this.base(arguments, val, old, name);
+      // FIXME: maybe there is a better way to refresh the 
+      // buttons minWidth at this point.
+      this._applyButtonMinWidth(this.getButtonMinWidth());
+
       this.__resetButtonsLayout();
     },
 
