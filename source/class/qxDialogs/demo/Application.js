@@ -101,12 +101,16 @@ qx.Class.define("qxDialogs.demo.Application", {
         this
       );
 
+      const spinner = new qx.ui.form.Spinner();
+      spinner.bind("value", buttonBox, "buttonsDistance");
+
       doc.add(buttonBox, {top: 100, left: 100});
 
       doc.add(addApplyButton, {top: 150, left: 100});
       doc.add(removeApplyButton, {top: 150, left: 250});
       doc.add(horizontalOrientation, {top: 180, left: 100});
       doc.add(verticalOrientation, {top: 180, left: 250});
+      doc.add(spinner, {top: 200, left: 100});
     }
   }
 });
