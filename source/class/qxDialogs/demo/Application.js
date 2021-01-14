@@ -66,20 +66,51 @@ qx.Class.define("qxDialogs.demo.Application", {
       );
 
       const addApplyButton = new qx.ui.form.Button("Add Apply button");
-      addApplyButton.addListener("execute", function() {
-        buttonBox.addButton(buttonsEnum.APPLY);
-      }, this);
+      addApplyButton.addListener(
+        "execute",
+        function () {
+          buttonBox.addButton(buttonsEnum.APPLY);
+        },
+        this
+      );
 
       const removeApplyButton = new qx.ui.form.Button("Remove Apply button");
-      removeApplyButton.addListener("execute", function(){
-        buttonBox.removeStandardButton(buttonsEnum.APPLY);
-      },this);
+      removeApplyButton.addListener(
+        "execute",
+        function () {
+          buttonBox.removeStandardButton(buttonsEnum.APPLY);
+        },
+        this
+      );
 
+      const horizontalOrientation = new qx.ui.form.Button('Set "horizontal"');
+      horizontalOrientation.addListener(
+        "execute",
+        function () {
+          buttonBox.setOrientation("horizontal");
+        },
+        this
+      );
+
+      const verticalOrientation = new qx.ui.form.Button('Set "vertical"');
+      verticalOrientation.addListener(
+        "execute",
+        function () {
+          buttonBox.setOrientation("vertical");
+        },
+        this
+      );
+
+      const spinner = new qx.ui.form.Spinner();
+      spinner.bind("value", buttonBox, "buttonsDistance");
 
       doc.add(buttonBox, {top: 100, left: 100});
 
       doc.add(addApplyButton, {top: 150, left: 100});
-      doc.add(removeApplyButton, {top: 150, left: 200});
+      doc.add(removeApplyButton, {top: 150, left: 250});
+      doc.add(horizontalOrientation, {top: 180, left: 100});
+      doc.add(verticalOrientation, {top: 180, left: 250});
+      doc.add(spinner, {top: 200, left: 100});
     }
   }
 });

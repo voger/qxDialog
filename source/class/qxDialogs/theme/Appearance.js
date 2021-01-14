@@ -8,11 +8,19 @@
 
 ************************************************************************ */
 
-qx.Theme.define("qxDialogs.theme.Appearance",
-{
-  extend : qx.theme.indigo.Appearance,
+qx.Theme.define("qxDialogs.theme.Appearance", {
+  extend: qx.theme.indigo.Appearance,
 
-  appearances :
-  {
+  appearances: {
+    "qxdialogs-buttonBox": {
+      include: "widget",
+
+      style: function (_) {
+        return {
+          buttonsDistance: 5,
+          buttonMinWidth: 80
+        };
+      }
+    }
   }
 });
