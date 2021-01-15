@@ -83,34 +83,20 @@ qx.Class.define("qxDialogs.demo.Application", {
         this
       );
 
-      const horizontalOrientation = new qx.ui.form.Button('Set "horizontal"');
-      horizontalOrientation.addListener(
-        "execute",
-        function () {
-          buttonBox.setOrientation("horizontal");
-        },
-        this
-      );
+      const disposeButton = new qx.ui.form.Button("Dispose");
+      disposeButton.addListener("execute", function() {
+        doc.remove(buttonBox);
+        buttonBox.dispose();
+      }, this);
 
-      const verticalOrientation = new qx.ui.form.Button('Set "vertical"');
-      verticalOrientation.addListener(
-        "execute",
-        function () {
-          buttonBox.setOrientation("vertical");
-        },
-        this
-      );
 
-      const spinner = new qx.ui.form.Spinner();
-      spinner.bind("value", buttonBox, "buttonsDistance");
 
       doc.add(buttonBox, {top: 100, left: 100});
 
       doc.add(addApplyButton, {top: 150, left: 100});
       doc.add(removeApplyButton, {top: 150, left: 250});
-      doc.add(horizontalOrientation, {top: 180, left: 100});
-      doc.add(verticalOrientation, {top: 180, left: 250});
-      doc.add(spinner, {top: 200, left: 100});
+
+      doc.add(disposeButton, {top: 180, left: 100});
     }
   }
 });

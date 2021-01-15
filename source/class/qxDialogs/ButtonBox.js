@@ -241,31 +241,30 @@ qx.Class.define("qxDialogs.ButtonBox", {
     },
 
     /**
-     * Removes a button.
+     * Removes a button. Returns true if the button is found
+     * in the internal list, undefined otherwise.
+     * Regarding standard buttons: Because the calling code is
+     * responsible for their creation, it is also responsible for
+     * their disposal as it would do with any other non-standard
+     * buttons added to this widget.
+     *
      * @param button {qx.ui.form.Button}
      *
-     * @return {qx.ui.form.Button}
+     * @return {qx.ui.form.Button | undefined}
      *
      */
     removeButton: function (button) {
       button.removeListener("execute", this.__handleButtonExecute, this);
-
-      const isStandard = this.__standardButtons.delete(button);
+      let isRemoved;
 
       for (const role of this.__buttonLists.values()) {
-        qx.lang.Array.remove(role, button);
+        if (qx.lang.Array.remove(role, button)) {
+          isRemoved = true;
+        }
       }
 
       this.remove(button);
-
-      // If the button is a standardButton, we are responsible for it's
-      // disposal and we don't have to return anything. Otherwise return
-      // it as it is and let the caller decide what to do with it.
-      if (isStandard) {
-        button.dispose();
-        return;
-      }
-      return button;
+      return isRemoved ? button : isRemoved;
     },
 
     /**
@@ -276,8 +275,8 @@ qx.Class.define("qxDialogs.ButtonBox", {
     removeStandardButton: function (sButton) {
       for (const [button, value] of this.__standardButtons.entries()) {
         if (value === sButton) {
-          this.removeButton(button);
-          return;
+          this.__standardButtons.delete(button);
+          return this.removeButton(button);
         }
       }
     },
@@ -394,13 +393,12 @@ qx.Class.define("qxDialogs.ButtonBox", {
 
     _applyButtonMinWidth: function (val) {
       const layout = this.getLayout();
-
       const minWidth = this.getOrientation() === "horizontal" ? val : null;
 
-      for (const buttonsArr of this.__buttonLists.values()) {
-        for (const button of buttonsArr) {
-          button.setMinWidth(minWidth);
-        }
+      const buttons = this.buttons();
+
+      for (const button of buttons) {
+        button.setMinWidth(minWidth);
       }
     },
 
@@ -417,7 +415,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
       }
       oldLayout && oldLayout.dispose();
 
-      // FIXME: maybe there is a better way to refresh the 
+      // FIXME: maybe there is a better way to refresh the
       // buttons minWidth at this point.
       this._applyButtonMinWidth(this.getButtonMinWidth());
 
@@ -604,6 +602,13 @@ qx.Class.define("qxDialogs.ButtonBox", {
           this.constructor.roles.SPACER
         ]
       };
+    }
+  },
+
+  destruct: function () {
+    for (const button of this.buttons()) {
+      button.removeAllBindings();
+      button.dispose();
     }
   }
 });
