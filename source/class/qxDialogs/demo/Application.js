@@ -56,47 +56,25 @@ qx.Class.define("qxDialogs.demo.Application", {
         buttonsEnum.NO
       ];
 
-      const buttonBox = new qxDialogs.ButtonBox(standardButtons).set({
-        minWidth: 500
+      const dialog = new qxDialogs.MessageBox(null, standardButtons);
+      dialog.setOnAccepted(() => {
+        console.log("Yay it works");
       });
 
-      buttonBox.addButton(
-        new qx.ui.form.Button("Test"),
-        qxDialogs.ButtonBox.roles.RESET
-      );
+      dialog.setVerticalButtonsPosition("right");
+      dialog.setOrientation("vertical");
 
-      const addApplyButton = new qx.ui.form.Button("Add Apply button");
-      addApplyButton.addListener(
+      const openDialog = new qx.ui.form.Button("Open MessageBox");
+
+      openDialog.addListener(
         "execute",
         function () {
-          buttonBox.addButton(buttonsEnum.APPLY);
+          dialog.open();
         },
         this
       );
 
-      const removeApplyButton = new qx.ui.form.Button("Remove Apply button");
-      removeApplyButton.addListener(
-        "execute",
-        function () {
-          buttonBox.removeStandardButton(buttonsEnum.APPLY);
-        },
-        this
-      );
-
-      const disposeButton = new qx.ui.form.Button("Dispose");
-      disposeButton.addListener("execute", function() {
-        doc.remove(buttonBox);
-        buttonBox.dispose();
-      }, this);
-
-
-
-      doc.add(buttonBox, {top: 100, left: 100});
-
-      doc.add(addApplyButton, {top: 150, left: 100});
-      doc.add(removeApplyButton, {top: 150, left: 250});
-
-      doc.add(disposeButton, {top: 180, left: 100});
+      doc.add(openDialog, {top: 50, left: 50});
     }
   }
 });
