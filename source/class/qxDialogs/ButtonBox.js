@@ -196,6 +196,15 @@ qx.Class.define("qxDialogs.ButtonBox", {
       this.__resetButtonsLayout();
     },
 
+    /**
+     * Creates and adds standard buttons to the widget
+     * @param sButtons {Array} array of the standard buttons
+     *                         to be created
+     */
+    addStandardButtons: function (sButtons) {
+      this.__createStandardButtons(sButtons);
+    },
+
     __addButton: function (button, role) {
       if (!qx.lang.Object.contains(this.constructor.roles, role)) {
         this.warn(`Role ${role} is invalid. Button not added`);
@@ -557,11 +566,10 @@ qx.Class.define("qxDialogs.ButtonBox", {
 
     __handleButtonExecute: function (event) {
       const button = event.getTarget();
-
       this.fireDataEvent("clicked", button);
 
       const roles = this.constructor.roles;
-      switch (this.__buttonRole(button)) {
+      switch (this.buttonRole(button)) {
         case roles.ACCEPT:
         case roles.YES:
           this.fireEvent("accepted");

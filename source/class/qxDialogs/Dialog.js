@@ -3,24 +3,12 @@ qx.Class.define("qxDialogs.Dialog", {
 
   events: {
     /**
-     * Emmited when the color of the blocker changes
-     *
-     */
-    changeBlockerColor: "qx.event.type.Data",
-
-    /**
-     * Emmited when the blocker opacity changes
-     *
-     */
-    changeBlockerOpacity: "qx.event.type.Data",
-
-    /**
      * Emmited when the dialog is closed with `accepted` or `rejected`.
      * By default calling `getData()` on this event returns `undefined`.
      * Set a function to the property `onDone` to return something meaningful.
      *
      */
-    "done": "qx.event.type.Data",
+    "finished": "qx.event.type.Data",
 
     /**
      * Emited when the dialog is closed with `accepted`.
@@ -36,7 +24,19 @@ qx.Class.define("qxDialogs.Dialog", {
      * Set a function to the property `onRejected` to return something meaningful.
      *
      */
-    "rejected": "qx.event.type.Data"
+    "rejected": "qx.event.type.Data",
+
+    /**
+     * Emmited when the color of the blocker changes
+     *
+     */
+    "changeBlockerColor": "qx.event.type.Data",
+
+    /**
+     * Emmited when the blocker opacity changes
+     *
+     */
+    "changeBlockerOpacity": "qx.event.type.Data"
   },
 
   properties: {
@@ -74,6 +74,27 @@ qx.Class.define("qxDialogs.Dialog", {
         return;
       },
       nullable: false
+    },
+
+    orientation: {
+      check: ["horizontal", "vertical"],
+      nullable: false,
+      init: "horizontal",
+      event: "changeOrientation",
+      apply: "_refreshButtonBoxPosition"
+    },
+
+    /**
+     * The position of the buttons
+     * when the orientation is horizontal.
+     *
+     */
+    verticalButtonsPosition: {
+      check: ["left", "right"],
+      nullable: false,
+      init: "left",
+      event: "changeVerticalButtonsPosition",
+      apply: "_refreshButtonBoxPosition"
     },
 
     useBlocker: {
@@ -174,17 +195,35 @@ qx.Class.define("qxDialogs.Dialog", {
     }
   },
 
-  construct: function (content, blockedItem) {
+  statics: {
+    returnCode: Object.defineProperties(
+      {},
+      {
+        ACCEPTED: {
+          value: "ACCEPTED",
+          writable: false
+        },
+        REJECTED: {
+          value: "REJECTED",
+          writable: false
+        }
+      }
+    )
+  },
+
+  construct: function (content, sButtons = [], parent) {
     this.base(arguments);
+
+    this.setLayout(new qx.ui.layout.Dock());
 
     // initialize the blocked item. If none is passed, the default
     // is the application root.
-    this.initBlockedItem(
-      blockedItem || qx.core.Init.getApplication().getRoot()
-    );
-    const blocker = (this.__blocker = new qx.ui.core.Blocker(
-      this.getBlockedItem()
-    ));
+    this.initParent(parent || qx.core.Init.getApplication().getRoot());
+    const blocker = (this.__blocker = new qx.ui.core.Blocker(this.getParent()));
+
+    const bBox = this.getButtonBox();
+    bBox.addStandardButtons(sButtons);
+    this.add(bBox, {edge: this.__buttonBoxPosition()});
 
     this.bind("blockerColor", this.__blocker, "color");
     this.bind("blockerOpacity", this.__blocker, "opacity");
@@ -197,6 +236,51 @@ qx.Class.define("qxDialogs.Dialog", {
 
   members: {
     __blocker: null,
+    __result: null,
+    __bBox: null,
+
+    getButtonBox: function () {
+      let control;
+      if (this.__bBox) {
+        return this.__bBox;
+      }
+
+      const bBox = (this.__bBox = new qxDialogs.ButtonBox());
+      this.bind("orientation", bBox, "orientation");
+      return bBox;
+    },
+
+    addButton: function (button, role) {
+      this.getButtonBox().addButton(button, role);
+    },
+
+    addStandardButtons: function (sButtons) {
+      this.getButtonBox().addStandardButtons(sButtons);
+    },
+
+    removeButton: function (button) {
+      this.getButtonBox().removeButton(button);
+    },
+
+    removeStandardButton: function (sButton) {
+      this.getButtonBox().removeStandardButton(sButton);
+    },
+
+    clearButtons: function () {
+      this.getButtonBox().clearButtons();
+    },
+
+    buttons: function () {
+      this.getButtonBox().buttons();
+    },
+
+    standardButton: function (button) {
+      this.getButtonBox().standardButton(button);
+    },
+
+    buttonRole: function (button) {
+      this.getButtonBox().buttonRole(button);
+    },
 
     /**
      * Centers the dialog to the blocked widget
@@ -206,13 +290,43 @@ qx.Class.define("qxDialogs.Dialog", {
       const {
         height: targetHeight,
         width: targetWidth
-      } = this.getBlockedItem().getBounds();
+      } = this.getParent().getBounds();
 
       const {height: dialogHeight, width: dialogWidth} = this.getSizeHint(true);
 
       const left = Math.round((targetWidth - dialogWidth) / 2);
       const top = Math.round((targetHeight - dialogHeight) / 2);
       this.moveTo(left, top);
+    },
+
+    done: function (result) {
+      this.close();
+      this.setResult(result);
+      this.fireDataEvent("finished", result);
+
+      if (this.constructor.returnCode.ACCEPTED === result) {
+        this.fireEvent("accepted");
+      } else if (this.constructor.returnCode.REJECTED === result) {
+        this.fireEvent("rejected");
+      }
+    },
+
+    accept: function () {
+      this.done(this.constructor.returnCode.ACCEPTED);
+    },
+
+    reject: function () {
+      this.done(this.constructor.returnCode.REJECTED);
+    },
+
+    setResult: function (result) {
+      this.__result = result;
+    },
+
+    _refreshButtonBoxPosition: function () {
+      const bBox = this.getButtonBox();
+      this.remove(bBox);
+      this.add(bBox, {edge: this.__buttonBoxPosition()});
     },
 
     __block: function () {
@@ -223,6 +337,25 @@ qx.Class.define("qxDialogs.Dialog", {
 
     __unblock: function () {
       this.__blocker.unblock();
+    },
+
+    // helper function to calculate the buttonBox edge
+    __buttonBoxPosition: function () {
+      let edge;
+      const orientation = this.getOrientation();
+
+      if (orientation === "horizontal") {
+        edge = "center";
+      } else if (orientation === "vertical") {
+        const hPosition = this.getVerticalButtonsPosition();
+
+        if (hPosition === "left") {
+          edge = "west";
+        } else if (hPosition === "right") {
+          edge = "east";
+        }
+      }
+      return edge;
     }
   }
 });
