@@ -71,9 +71,9 @@ qx.Class.define("qxDialogs.ButtonBox", {
       init: true
     },
 
-    focusable: {
-      refine: true,
-      init: false
+    // focusable: {
+    //   refine: true,
+    //   init: false
     }
   },
 
@@ -155,6 +155,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
 
     this.initOrientation(orientation);
     this.__createStandardButtons(buttonsArr);
+    this.setAnonymous(true);
   },
 
   members: {
@@ -167,6 +168,8 @@ qx.Class.define("qxDialogs.ButtonBox", {
 
     // contains only the standard buttons
     __standardButtons: null,
+
+    __defaultKey: this.constructor + ".default",
 
     /**
      * Adds a button. Button can be:
@@ -350,6 +353,56 @@ qx.Class.define("qxDialogs.ButtonBox", {
       }
 
       return this.constructor.role.INVALID;
+    },
+
+    /**
+     * Sets a button as default.
+     *
+     * @throws {Error} when button is not a member of this widget.
+     * @param button {qx.ui.form.Button} The button to set as default
+     *
+     */
+    setDefault: function (button) {
+      const buttons = this.buttons();
+      qx.core.Assert(
+        button,
+        buttons,
+        `The given button is not included in this widget.
+        Please add it first and then set it as default.`
+      );
+
+      for (const member in buttons) {
+        member.setUserData(this.__defaultKey, false);
+        if (button === member) {
+          member.setUserData(this.__defaultKey, true);
+        }
+      }
+    },
+
+    /**
+     * Return the default button or `undefined`
+     * if none is set
+     *
+     * @return {qx.ui.form.Button | undefined}
+     */
+    getDefault: function () {
+      return this.buttons().find((elem) => {
+        elem.getUserData(this.__defaultKey);
+      });
+    },
+
+    /**
+     * Determine if button is default for this widget.
+     * Returns `false` if the button is not a member
+     * of this widget or if it is not set as default.
+     *
+     * @param button {qx.ui.form.Button} Button to check.
+     * @return {Boolean} Whether the button is default.
+     */
+    isDefault: function (button) {
+      return (
+        button.getUserData(this.__defaultKey) && this.buttons().includes(button)
+      );
     },
 
     layoutButtons: function () {
