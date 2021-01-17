@@ -1,6 +1,6 @@
 qx.Class.define("qxDialogs.Dialog", {
   extend: qx.ui.window.Window,
-
+  include: [qx.ui.core.MExecutable],
   events: {
     /**
      * Emmited when the dialog is closed with `accepted` or `rejected`.
@@ -196,19 +196,10 @@ qx.Class.define("qxDialogs.Dialog", {
   },
 
   statics: {
-    returnCode: Object.defineProperties(
-      {},
-      {
-        ACCEPTED: {
-          value: "ACCEPTED",
-          writable: false
-        },
-        REJECTED: {
-          value: "REJECTED",
-          writable: false
-        }
-      }
-    )
+    returnCode: {
+      ACCEPTED: "ACCEPTED",
+      REJECTED: "REJECTED"
+    }
   },
 
   construct: function (content, sButtons = [], parent) {
@@ -225,6 +216,12 @@ qx.Class.define("qxDialogs.Dialog", {
     bBox.addStandardButtons(sButtons);
     this.add(bBox, {edge: this.__buttonBoxPosition()});
 
+    this.__escCommand = new qx.ui.command.Command("Esc");
+    this.__escCommand.addListener("execute", this.reject, this);
+
+    this.__enterCommand = new qx.ui.command.Command("Enter");
+    this.__enterCommand.addListener("execute", this.handleEnter, this);
+
     this.bind("blockerColor", this.__blocker, "color");
     this.bind("blockerOpacity", this.__blocker, "opacity");
 
@@ -238,6 +235,8 @@ qx.Class.define("qxDialogs.Dialog", {
     __blocker: null,
     __result: null,
     __bBox: null,
+    __escCommand: null,
+    __enterCommand: null,
 
     getButtonBox: function () {
       let control;
@@ -271,15 +270,35 @@ qx.Class.define("qxDialogs.Dialog", {
     },
 
     buttons: function () {
-      this.getButtonBox().buttons();
+      return this.getButtonBox().buttons();
     },
 
     standardButton: function (button) {
-      this.getButtonBox().standardButton(button);
+      return this.getButtonBox().standardButton(button);
     },
 
     buttonRole: function (button) {
-      this.getButtonBox().buttonRole(button);
+      return this.getButtonBox().buttonRole(button);
+    },
+
+    setDefault: function (button) {
+      this.getButtonBox().setDefault(button);
+    },
+
+    getDefault: function () {
+      return this.getButtonBox().getDefault();
+    },
+
+    isDefault: function (button) {
+      return this.getButtonBox().isDefault();
+    },
+
+    handleEnter: function () {
+      const defaultButton = this.getDefault();
+
+      if (defaultButton) {
+        defaultButton.execute();
+      }
     },
 
     /**
@@ -304,19 +323,19 @@ qx.Class.define("qxDialogs.Dialog", {
       this.setResult(result);
       this.fireDataEvent("finished", result);
 
-      if (this.constructor.returnCode.ACCEPTED === result) {
+      if (qxDialogs.Dialog.returnCode.ACCEPTED === result) {
         this.fireEvent("accepted");
-      } else if (this.constructor.returnCode.REJECTED === result) {
+      } else if (qxDialogs.Dialog.returnCode.REJECTED === result) {
         this.fireEvent("rejected");
       }
     },
 
     accept: function () {
-      this.done(this.constructor.returnCode.ACCEPTED);
+      this.done(qxDialogs.Dialog.returnCode.ACCEPTED);
     },
 
     reject: function () {
-      this.done(this.constructor.returnCode.REJECTED);
+      this.done(qxDialogs.Dialog.returnCode.REJECTED);
     },
 
     setResult: function (result) {

@@ -62,7 +62,8 @@ qx.Class.define("qxDialogs.demo.Application", {
       });
 
       dialog.setVerticalButtonsPosition("right");
-      dialog.setOrientation("vertical");
+      // dialog.setOrientation("vertical");
+      dialog.setModal(false);
 
       const openDialog = new qx.ui.form.Button("Open MessageBox");
 
@@ -74,7 +75,23 @@ qx.Class.define("qxDialogs.demo.Application", {
         this
       );
 
+      const orientationButton = new qx.ui.form.Button("Orientation");
+
+      orientationButton.addListener(
+        "execute",
+        function () {
+          const orientation = dialog.getOrientation();
+          if (orientation === "vertical") {
+            dialog.setOrientation("horizontal");
+          } else if (orientation === "horizontal") {
+            dialog.setOrientation("vertical");
+          }
+        },
+        this
+      );
+
       doc.add(openDialog, {top: 50, left: 50});
+      doc.add(orientationButton, {top: 80, left: 50});
     }
   }
 });
