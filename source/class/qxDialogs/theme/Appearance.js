@@ -21,6 +21,24 @@ qx.Theme.define("qxDialogs.theme.Appearance", {
           buttonMinWidth: 80
         };
       }
+    },
+
+    "qxdialogs-messagebox-content": {
+      include: "widget",
+
+      style: function (_) {
+        return {
+          margin: [10, 20]
+        };
+      }
+    },
+
+    "qxdialogs-messagebox-message": {
+      style: function (_) {
+        return {
+          font: "bold"
+        };
+      }
     }
   }
 });
