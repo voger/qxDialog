@@ -125,6 +125,16 @@ qx.Class.define("qxDialogs.Dialog", {
     },
 
     // overrides
+    centerOnAppear: {
+      refine: true,
+      init: true
+    },
+
+    centerOnContainerResize: {
+      refine: true,
+      init: true
+    },
+
     visibility: {
       refine: true,
       init: "hidden"
@@ -228,7 +238,7 @@ qx.Class.define("qxDialogs.Dialog", {
     this.addListener("appear", this.__block, this);
     this.addListener("close", this.__unblock, this);
 
-    this.addListener("appear", this.center, this);
+    // this.addListener("appear", this.center, this);
   },
 
   members: {

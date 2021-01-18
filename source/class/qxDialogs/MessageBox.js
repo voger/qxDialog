@@ -49,15 +49,6 @@ qx.Class.define("qxDialogs.MessageBox", {
    * Message is the informative message
    * Buttons is an array of default buttons
    */
-  construct: function (text, message, icon, buttons = []) {
-    this.base(arguments);
-
-    this.setText(text);
-    this.setMessage(message);
-    this.setDialogIcon(icon);
-
-
-  },
 
   members: {
 

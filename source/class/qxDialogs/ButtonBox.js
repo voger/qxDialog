@@ -74,7 +74,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
     // focusable: {
     //   refine: true,
     //   init: false
-    }
+    // }
   },
 
   events: {
