@@ -212,7 +212,7 @@ qx.Class.define("qxDialogs.Dialog", {
     }
   },
 
-  construct: function (content, sButtons = [], parent) {
+  construct: function (sButtons = [], parent) {
     this.base(arguments);
 
     this.setLayout(new qx.ui.layout.Dock());
@@ -225,6 +225,9 @@ qx.Class.define("qxDialogs.Dialog", {
     const bBox = this.getButtonBox();
     bBox.addStandardButtons(sButtons);
     this.add(bBox, {edge: this.__buttonBoxPosition()});
+
+    const content = this.getContentPane();
+    this.add(content, {edge: "north"});
 
     this.__escCommand = new qx.ui.command.Command("Esc");
     this.__escCommand.addListener("execute", this.reject, this);
@@ -270,7 +273,8 @@ qx.Class.define("qxDialogs.Dialog", {
         return this.__content;
       }
 
-      const content = new qx.ui.container.Composite();
+      const content = (this.__content = new qx.ui.container.Composite());
+      
       return content;
     },
 

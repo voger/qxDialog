@@ -1,47 +1,23 @@
 qx.Class.define("qxDialogs.MessageBox", {
   extend: qxDialogs.Dialog,
 
-  events: {
-    /**
-     * Emmited when the dialog is closed with `accepted` or `rejected`.
-     * By default calling `getData()` on this event returns `undefined`.
-     * Set a function to the property `onDone` to return something meaningful.
-     *
-     */
-    "done": "qx.event.type.Data",
-
-    /**
-     * Emited when the dialog is closed with `accepted`.
-     * By default calling `getData()` on this event returns `undefined`.
-     * Set a function to the property `onAccepted` to return something meaningful.
-     *
-     */
-    "accepted": "qx.event.type.Data",
-
-    /**
-     * Emited when the dialog is closed with `rejected`.
-     * By default calling `getData()` on this event returns `undefined`.
-     * Set a function to the property `onRejected` to return something meaningful.
-     *
-     */
-    "rejected": "qx.event.type.Data"
-  },
-
   properties: {
     message: {
       check: "String",
-      nullable: true
+      nullable: true,
+      event: "changMessage"
     },
 
     text: {
       check: "String",
-      nullable: true
+      nullable: true,
+      event: "changeText"
     },
 
     dialogIcon: {
-      nullable: true
-    },
-
+      nullable: true,
+      event: "changeDialogIcon"
+    }
   },
 
   /**
@@ -49,8 +25,40 @@ qx.Class.define("qxDialogs.MessageBox", {
    * Message is the informative message
    * Buttons is an array of default buttons
    */
+  construct: function ({message: msg, text: txt}, sButtons = [], parent) {
+    this.base(arguments, sButtons, parent);
+    this.setMessage(msg);
+    this.setText(txt);
+
+    const message = (this.__msgLabel = new qx.ui.basic.Label());
+    message.setAppearance("qxdialogs-messagebox-message");
+    this.bind("message", message, "value");
+
+    this.bind("message", this, "caption");
+
+    const text = (this.__msgText = new qx.ui.basic.Label());
+    this.bind("text", text, "value");
+
+    const icon = (this.__dlgIcon = new qx.ui.basic.Image());
+    this.bind("dialogIcon", icon, "source");
+
+    const content = this.getContentPane();
+    content.setLayout(new qx.ui.layout.Atom());
+    content.setAppearance("qxdialogs-messagebox-content");
+
+    const strings = new qx.ui.container.Composite(new qx.ui.layout.VBox());
+    strings.add(message);
+    strings.add(text);
+    content.add(strings);
+  },
 
   members: {
+    __msgLabel: null,
+    __txtLabel: null,
+    __dlgIcon: null
+  },
 
+  destruct: function () {
+    this._disposeObjects("__msgLabel", "__txtLabel", "__dlgIcon");
   }
 });

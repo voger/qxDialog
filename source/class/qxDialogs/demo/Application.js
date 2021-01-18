@@ -56,7 +56,12 @@ qx.Class.define("qxDialogs.demo.Application", {
         buttonsEnum.NO
       ];
 
-      const dialog = new qxDialogs.MessageBox(null, standardButtons);
+      const message = {
+        message: "Hello there",
+        text: "It works. Aren't you happy?"
+      };
+
+      const dialog = new qxDialogs.MessageBox(message, standardButtons);
       dialog.setOnAccepted(() => {
         console.log("Yay it works");
       });
