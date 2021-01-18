@@ -20,6 +20,11 @@ qx.Class.define("qxDialogs.ButtonBox", {
       apply: "_applyOrientation"
     },
 
+    /**
+     * Whether the buttons should be 
+     * centered or follow layout spacing
+     *
+     */
     center: {
       nullable: false,
       check: "Boolean",

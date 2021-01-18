@@ -237,19 +237,21 @@ qx.Class.define("qxDialogs.Dialog", {
 
     this.addListener("appear", this.__block, this);
     this.addListener("close", this.__unblock, this);
-
-    // this.addListener("appear", this.center, this);
   },
 
   members: {
     __blocker: null,
     __result: null,
     __bBox: null,
+    __content: null,
     __escCommand: null,
     __enterCommand: null,
 
+    /**
+     * Returns the buttons container
+     *
+     */
     getButtonBox: function () {
-      let control;
       if (this.__bBox) {
         return this.__bBox;
       }
@@ -259,73 +261,25 @@ qx.Class.define("qxDialogs.Dialog", {
       return bBox;
     },
 
-    addButton: function (button, role) {
-      this.getButtonBox().addButton(button, role);
-    },
+    /**
+     * Returns the content pane
+     *
+     */
+    getContentPane: function () {
+      if (this.__content) {
+        return this.__content;
+      }
 
-    addStandardButtons: function (sButtons) {
-      this.getButtonBox().addStandardButtons(sButtons);
-    },
-
-    removeButton: function (button) {
-      this.getButtonBox().removeButton(button);
-    },
-
-    removeStandardButton: function (sButton) {
-      this.getButtonBox().removeStandardButton(sButton);
-    },
-
-    clearButtons: function () {
-      this.getButtonBox().clearButtons();
-    },
-
-    buttons: function () {
-      return this.getButtonBox().buttons();
-    },
-
-    standardButton: function (button) {
-      return this.getButtonBox().standardButton(button);
-    },
-
-    buttonRole: function (button) {
-      return this.getButtonBox().buttonRole(button);
-    },
-
-    setDefault: function (button) {
-      this.getButtonBox().setDefault(button);
-    },
-
-    getDefault: function () {
-      return this.getButtonBox().getDefault();
-    },
-
-    isDefault: function (button) {
-      return this.getButtonBox().isDefault();
+      const content = new qx.ui.container.Composite();
+      return content;
     },
 
     handleEnter: function () {
-      const defaultButton = this.getDefault();
+      const defaultButton = this.getButtonBox().getDefault();
 
       if (defaultButton) {
         defaultButton.execute();
       }
-    },
-
-    /**
-     * Centers the dialog to the blocked widget
-     *
-     */
-    center: function () {
-      const {
-        height: targetHeight,
-        width: targetWidth
-      } = this.getParent().getBounds();
-
-      const {height: dialogHeight, width: dialogWidth} = this.getSizeHint(true);
-
-      const left = Math.round((targetWidth - dialogWidth) / 2);
-      const top = Math.round((targetHeight - dialogHeight) / 2);
-      this.moveTo(left, top);
     },
 
     done: function (result) {
