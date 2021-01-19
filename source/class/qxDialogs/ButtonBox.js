@@ -21,7 +21,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
     },
 
     /**
-     * Whether the buttons should be 
+     * Whether the buttons should be
      * centered or follow layout spacing
      *
      */
@@ -74,7 +74,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
     allowGrowY: {
       refine: true,
       init: true
-    },
+    }
 
     // focusable: {
     //   refine: true,
@@ -333,6 +333,21 @@ qx.Class.define("qxDialogs.ButtonBox", {
      */
     standardButton: function (button) {
       return this.__standardButtons.get(button) || this.constructor.NOBUTTON;
+    },
+    /**
+     * Return button from standardButtons enum value or `undefined`
+     * if no such button exist.
+     *
+     * @param sButton {String} One of the standard buttons enum values.
+     * @return {qx.ui.form.Button | undefined}
+     *
+     */
+    fromStandardButton: function (sButton) {
+      for (const [button, val] of this.__standardButtons.entries()) {
+        if (val === sButton) {
+          return button;
+        }
+      }
     },
 
     /**
