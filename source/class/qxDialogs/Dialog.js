@@ -252,6 +252,8 @@ qx.Class.define("qxDialogs.Dialog", {
     __escCommand: null,
     __enterCommand: null,
 
+    __defaultButton: null,
+
     /**
      * Returns the buttons container
      *
@@ -276,8 +278,27 @@ qx.Class.define("qxDialogs.Dialog", {
       }
 
       const content = (this.__content = new qx.ui.container.Composite());
-      
+
       return content;
+    },
+
+    /**
+     * Sets the button as default.
+     *
+     * @param button {qx.ui.form.Button | String} can be a button or one of
+     * the values of qx.ButtonBox.standardButtons enum.
+     *
+     * @throws if the button is not included in this widget.
+     */
+    setDefaultButton: function (button) {
+      const bBox = this.getButtonBox();
+
+      const defaultBtn = qx.lang.Type.isString(button)
+        ? bBox.fromStandardButton(button)
+        : button;
+
+      bBox.setDefault(defaulBtn);
+      this.__defaultButton = defaultBtn;
     },
 
     handleEnter: function () {
@@ -345,6 +366,7 @@ qx.Class.define("qxDialogs.Dialog", {
         }
       }
       return edge;
-    }
+    },
+
   }
 });
