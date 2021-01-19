@@ -66,8 +66,6 @@ qx.Class.define("qxDialogs.demo.Application", {
         console.log("Yay it works");
       });
 
-      dialog.setVerticalButtonsPosition("right");
-      // dialog.setOrientation("vertical");
       dialog.setModal(false);
 
       const openDialog = new qx.ui.form.Button("Open MessageBox");

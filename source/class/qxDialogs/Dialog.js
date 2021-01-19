@@ -215,7 +215,9 @@ qx.Class.define("qxDialogs.Dialog", {
   construct: function (sButtons = [], parent) {
     this.base(arguments);
 
-    this.setLayout(new qx.ui.layout.Dock());
+    const dockLayout = new qx.ui.layout.Dock();
+    dockLayout.setSort("x");
+    this.getChildrenContainer().setLayout(dockLayout);
 
     // initialize the blocked item. If none is passed, the default
     // is the application root.
