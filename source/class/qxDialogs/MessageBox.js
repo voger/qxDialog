@@ -30,6 +30,7 @@ qx.Class.define("qxDialogs.MessageBox", {
     this.setMessage(msg);
     this.setText(txt);
 
+    // content
     const message = (this.__msgLabel = new qx.ui.basic.Label());
     message.setAppearance("qxdialogs-messagebox-message");
     this.bind("message", message, "value");
@@ -50,12 +51,26 @@ qx.Class.define("qxDialogs.MessageBox", {
     strings.add(message);
     strings.add(text);
     content.add(strings);
+
+    // buttons
+    const bBox = this.getButtonBox();
+    bBox.set({
+      center: true
+    });
+
+    bBox.addListener("clicked", this.__onClicked, this);
   },
 
   members: {
     __msgLabel: null,
     __txtLabel: null,
-    __dlgIcon: null
+    __dlgIcon: null,
+
+
+    __onClicked: function(evt) {
+      const button = evt.getData();
+      console.log(`You clicked ${button.getLabel()}`);
+    }
   },
 
   destruct: function () {
