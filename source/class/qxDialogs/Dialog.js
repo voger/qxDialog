@@ -1,30 +1,45 @@
+/**
+ * This class serves as a base class for other dialogs.
+ * It can also be used on it's own. It provides a window
+ * widget which contains a buttons pane {@link qxDialogs.ButtonBox} and
+ * a content pane {@link qx.ui.container.Composite}
+ *
+ *
+ */
 qx.Class.define("qxDialogs.Dialog", {
   extend: qx.ui.window.Window,
   include: [qx.ui.core.MExecutable],
   events: {
     /**
      * Emmited when the dialog is closed with `accepted` or `rejected`.
-     * By default calling `getData()` on this event returns `undefined`.
-     * Set a function to the property `onDone` to return something meaningful.
      *
      */
     "finished": "qx.event.type.Data",
 
     /**
      * Emited when the dialog is closed with `accepted`.
-     * By default calling `getData()` on this event returns `undefined`.
-     * Set a function to the property `onAccepted` to return something meaningful.
      *
      */
-    "accepted": "qx.event.type.Data",
+    "accepted": "qx.event.type.Event",
 
     /**
      * Emited when the dialog is closed with `rejected`.
-     * By default calling `getData()` on this event returns `undefined`.
-     * Set a function to the property `onRejected` to return something meaningful.
      *
      */
     "rejected": "qx.event.type.Data",
+
+    /**
+     * Emited when a button is clicked.
+     * The method {@link qx.event.type.Data#getData} returns the
+     * clicked button instance.
+     *
+     */
+    "clicked": "qx.event.type.Data",
+
+    /**
+     * Emited when a button in this dialogs buttonBox is clicked
+     *
+     */
 
     /**
      * Emmited when the color of the blocker changes
@@ -40,42 +55,6 @@ qx.Class.define("qxDialogs.Dialog", {
   },
 
   properties: {
-    /**
-     * Callback function when the dialog is accepted.
-     *
-     */
-    onAccepted: {
-      check: "Function",
-      init: () => {
-        return;
-      },
-      nullable: false
-    },
-
-    /**
-     * Callback function when the dialog is rejected.
-     *
-     */
-    onRejected: {
-      check: "Function",
-      init: () => {
-        return;
-      },
-      nullable: false
-    },
-
-    /**
-     * Callback function when the dialog is closed.
-     *
-     */
-    onDone: {
-      check: "Function",
-      init: () => {
-        return;
-      },
-      nullable: false
-    },
-
     orientation: {
       check: ["horizontal", "vertical"],
       nullable: false,
@@ -226,6 +205,13 @@ qx.Class.define("qxDialogs.Dialog", {
 
     const bBox = this.getButtonBox();
     bBox.addStandardButtons(sButtons);
+
+    bBox.addListener("accepted", this.accept, this);
+    bBox.addListener("rejected", this.reject, this);
+    bBox.addListener("clicked", (e) => {
+      this.fireDataEvent("clicked", e.getData());
+    });
+
     this.add(bBox, {edge: this.__buttonBoxPosition()});
 
     const content = this.getContentPane();
@@ -276,8 +262,34 @@ qx.Class.define("qxDialogs.Dialog", {
       }
 
       const content = (this.__content = new qx.ui.container.Composite());
-      
+
       return content;
+    },
+
+    addButton: function (button, role) {
+      this.getButtonBox().addButton(button, role);
+    },
+
+    removeButton: function (button) {
+      return this.getButtonBox().removeButton(button);
+    },
+
+    /**
+     * Sets the button as default.
+     *
+     * @param button {qx.ui.form.Button | String} can be a button or one of
+     * the values of qx.ButtonBox.standardButtons enum.
+     *
+     * @throws if the button is not included in this widget.
+     */
+    setDefaultButton: function (button) {
+      const bBox = this.getButtonBox();
+
+      const defaultBtn = qx.lang.Type.isString(button)
+        ? bBox.fromStandardButton(button)
+        : button;
+
+      bBox.setDefault(defaultBtn);
     },
 
     handleEnter: function () {
@@ -288,8 +300,12 @@ qx.Class.define("qxDialogs.Dialog", {
       }
     },
 
+    unsetDefaultButton: function (button) {
+      this.getButtonBox().unsetDefault(button);
+    },
+
     done: function (result) {
-      this.close();
+      this.hide();
       this.setResult(result);
       this.fireDataEvent("finished", result);
 
@@ -298,6 +314,9 @@ qx.Class.define("qxDialogs.Dialog", {
       } else if (qxDialogs.Dialog.returnCode.REJECTED === result) {
         this.fireEvent("rejected");
       }
+
+      // if autoDestroy is true then also destroy the window
+      this.close();
     },
 
     accept: function () {
@@ -310,6 +329,10 @@ qx.Class.define("qxDialogs.Dialog", {
 
     setResult: function (result) {
       this.__result = result;
+    },
+
+    getResult: function () {
+      return this.__result;
     },
 
     _refreshButtonBoxPosition: function () {

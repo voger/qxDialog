@@ -62,11 +62,16 @@ qx.Class.define("qxDialogs.demo.Application", {
       };
 
       const dialog = new qxDialogs.MessageBox(message, standardButtons);
-      dialog.setOnAccepted(() => {
-        console.log("Yay it works");
-      });
 
       dialog.setModal(false);
+
+      dialog.addListener("clicked", (e) => {
+        console.log("Clicked: ", e.getData().getLabel());
+      });
+
+      dialog.addListener("finished", (e) => {
+        console.log("Finished: ", e.getData());
+      });
 
       const openDialog = new qx.ui.form.Button("Open MessageBox");
 

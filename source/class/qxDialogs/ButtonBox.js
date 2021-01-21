@@ -21,7 +21,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
     },
 
     /**
-     * Whether the buttons should be 
+     * Whether the buttons should be
      * centered or follow layout spacing
      *
      */
@@ -55,6 +55,16 @@ qx.Class.define("qxDialogs.ButtonBox", {
     },
 
     /**
+     * Defult button
+     *
+     */
+    defaultButton: {
+      nullable: true,
+      check: "qx.ui.form.Button",
+      apply: "_applyDefaultButton"
+    },
+
+    /**
      * Minimum width for the buttons.
      * Used only in horizontal orientation.
      * Has no effect in vertical orientation.
@@ -74,7 +84,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
     allowGrowY: {
       refine: true,
       init: true
-    },
+    }
 
     // focusable: {
     //   refine: true,
@@ -184,8 +194,6 @@ qx.Class.define("qxDialogs.ButtonBox", {
      *
      * @param button  The button to be added
      * @param role {qxDialog.ButtonBox.roles} one of the ButtonBox roles
-     *
-     * @ return {qx.ui.form.Button} The button.
      */
     addButton: function (button, role) {
       if (button instanceof qx.ui.form.Button) {
@@ -272,7 +280,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
      */
     removeButton: function (button) {
       button.removeListener("execute", this.__handleButtonExecute, this);
-      let isRemoved;
+      let isRemoved = false;
 
       for (const role of this.__buttonLists.values()) {
         if (qx.lang.Array.remove(role, button)) {
@@ -281,7 +289,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
       }
 
       this.remove(button);
-      return isRemoved ? button : isRemoved;
+      return isRemoved ? button : undefined;
     },
 
     /**
@@ -334,6 +342,21 @@ qx.Class.define("qxDialogs.ButtonBox", {
     standardButton: function (button) {
       return this.__standardButtons.get(button) || this.constructor.NOBUTTON;
     },
+    /**
+     * Return button from standardButtons enum value or `undefined`
+     * if no such button exist.
+     *
+     * @param sButton {String} One of the standard buttons enum values.
+     * @return {qx.ui.form.Button | undefined}
+     *
+     */
+    fromStandardButton: function (sButton) {
+      for (const [button, val] of this.__standardButtons.entries()) {
+        if (val === sButton) {
+          return button;
+        }
+      }
+    },
 
     /**
      * Return a list of standard buttons used
@@ -369,6 +392,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
      */
     setDefault: function (button) {
       const buttons = this.buttons();
+
       qx.core.Assert(
         button,
         buttons,
@@ -377,11 +401,21 @@ qx.Class.define("qxDialogs.ButtonBox", {
       );
 
       for (const member in buttons) {
-        member.setUserData(this.__defaultKey, false);
+        this.unsetDefault(member);
         if (button === member) {
           member.setUserData(this.__defaultKey, true);
         }
       }
+    },
+
+    /**
+     * Button is no longer marked as default
+     *
+     * @param button {qx.ui.form.Button}
+     *
+     */
+    unsetDefault: function (button) {
+      button.setUserData(this.__defaultKey, false);
     },
 
     /**
@@ -491,6 +525,12 @@ qx.Class.define("qxDialogs.ButtonBox", {
 
     _applyButtonsLayout: function () {
       this.__resetButtonsLayout();
+    },
+
+    _applyDefaultButton: function (val, old) {
+      const state = "defaultButton";
+      old && old.removeState(state);
+      val && val.addState(state);
     },
 
     __addButtons: function (buttonsArr) {
