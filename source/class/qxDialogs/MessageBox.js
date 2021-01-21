@@ -1,6 +1,15 @@
 qx.Class.define("qxDialogs.MessageBox", {
   extend: qxDialogs.Dialog,
 
+  events: {
+    /**
+     * One of the buttons is clicked.
+     * data says which.
+     *
+     */
+    "buttonClicked": "qx.event.type.Data"
+  },
+
   properties: {
     message: {
       check: "String",
@@ -66,10 +75,24 @@ qx.Class.define("qxDialogs.MessageBox", {
     __txtLabel: null,
     __dlgIcon: null,
 
+    /**
+     * Adds a button. Button can be:
+     * * {String} In this case a new qx.ui.form.Button is created and the
+     *            string serves as it's label.
+     *
+     *
+     * @param button  The button to be added
+     * @param role {qxDialog.ButtonBox.roles} one of the ButtonBox roles
+     */
+    addButton: function (button, role) {
+      this.getButtonBox().addButton(button, role);
+    },
 
-    __onClicked: function(evt) {
+
+
+    __onClicked: function (evt) {
       const button = evt.getData();
-      console.log(`You clicked ${button.getLabel()}`);
+      this.fireDataEvent("buttonClicked", button);
     }
   },
 
