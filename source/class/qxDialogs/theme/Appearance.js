@@ -39,6 +39,33 @@ qx.Theme.define("qxDialogs.theme.Appearance", {
           font: "bold"
         };
       }
+    },
+
+    "qxdialogs-messagebox-icon": {
+      include: "image",
+
+      style: function (states) {
+        let source;
+
+        if (states["ERROR"]) {
+          source = "qxDialogs.icon.error";
+        } else if (states["WARNING"]) {
+          source = "qxDialogs.icon.warning";
+        } else if (states["QUESTION"]) {
+          source = "qxDialogs.icon.question";
+        } else if (states["SUCCESS"]) {
+          source = "qxDialogs.icon.success";
+        } else if (states["INFORMATION"]) {
+          source = "qxDialogs.icon.information";
+        } else {
+          source = null;
+        }
+
+        return {
+          source: source,
+          paddingRight: 10
+        };
+      }
     }
   }
 });
