@@ -25,7 +25,19 @@ qx.Class.define("qxDialogs.MessageBox", {
 
     dialogIcon: {
       nullable: true,
-      event: "changeDialogIcon"
+      // check: qx.module.util.Object.getValues(this.contructor.type),
+      event: "changeDialogIcon",
+      apply: "_applyDialogIcon",
+      themeable: true
+    }
+  },
+
+  statics: {
+    type: {
+      QUESTION: "QUESTION",
+      INFORMATION: "INFORMATION",
+      WARNING: "WARNING",
+      ERROR: "ERROR"
     }
   },
 
@@ -53,13 +65,22 @@ qx.Class.define("qxDialogs.MessageBox", {
     this.bind("dialogIcon", icon, "source");
 
     const content = this.getContentPane();
-    content.setLayout(new qx.ui.layout.Atom());
+    content.setLayout(
+      new qx.ui.layout.Atom().set({
+        center: true
+      })
+    );
     content.setAppearance("qxdialogs-messagebox-content");
 
     const strings = new qx.ui.container.Composite(new qx.ui.layout.VBox());
     strings.add(message);
     strings.add(text);
     content.add(strings);
+
+    const dlgIcon = (this.__dlgIcon = new qx.ui.basic.Image());
+    dlgIcon.exclude();
+    dlgIcon.setAppearance("qxdialogs-messagebox-icon");
+    content.addAt(dlgIcon, 0);
 
     // buttons
     const bBox = this.getButtonBox();
@@ -88,7 +109,20 @@ qx.Class.define("qxDialogs.MessageBox", {
       this.getButtonBox().addButton(button, role);
     },
 
+    _applyDialogIcon: function (val, old) {
+      const dlgIcon = this.__dlgIcon;
 
+      if (old !== null) {
+        dlgIcon.revemoveState(old);
+      }
+
+      if (val !== null) {
+        dlgIcon.addState(val);
+        dlgIcon.show();
+      } else {
+        dlgIcon.exclude();
+      }
+    },
 
     __onClicked: function (evt) {
       const button = evt.getData();

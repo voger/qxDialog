@@ -73,6 +73,8 @@ qx.Class.define("qxDialogs.demo.Application", {
         console.log("Finished: ", e.getData());
       });
 
+      dialog.setDialogIcon("WARNING")
+
       const openDialog = new qx.ui.form.Button("Open MessageBox");
 
       openDialog.addListener(
