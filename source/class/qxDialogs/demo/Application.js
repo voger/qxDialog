@@ -77,13 +77,10 @@ qx.Class.define("qxDialogs.demo.Application", {
 
       const openDialog = new qx.ui.form.Button("Open MessageBox");
 
-      openDialog.addListener(
-        "execute",
-        function () {
+      // prettier-ignore
+      openDialog.addListener("execute", function() {
           dialog.open();
-        },
-        this
-      );
+        }, this);
 
       const orientationButton = new qx.ui.form.Button("Orientation");
 
