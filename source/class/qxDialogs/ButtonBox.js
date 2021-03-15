@@ -120,40 +120,40 @@ qx.Class.define("qxDialogs.ButtonBox", {
 
   statics: {
     roles: {
-      INVALID: "INVALID", // The button is invalid.
-      ACCEPT: "ACCEPT", // Clicking the button causes the dialog to be accepted (e.g. OK).
-      REJECT: "REJECT", // Clicking the button causes the dialog to be rejected (e.g. Cancel).
-      DESTRUCTIVE: "DESTRUCTIVE", // Clicking the button causes a destructive change (e.g. for Discarding Changes) and closes the dialog.
-      ACTION: "ACTION", // Clicking the button causes changes to the elements within the dialog.
-      HELP: "HELP", // The button can be clicked to request help.
-      YES: "YES", // The button is a "Yes"-like button.
-      NO: "NO", // The button is a "No"-like button.
-      APPLY: "APPLY", // The button applies current changes.
-      RESET: "RESET", // The button resets the dialog's fields to default values.}
+      INVALID     : "INVALID",     // The button is invalid.
+      ACCEPT      : "ACCEPT",      // Clicking the button causes the dialog to be accepted (e.g. OK).
+      REJECT      : "REJECT",      // Clicking the button causes the dialog to be rejected (e.g. Cancel).
+      DESTRUCTIVE : "DESTRUCTIVE", // Clicking the button causes a destructive change (e.g. for Discarding Changes) and closes the dialog.
+      ACTION      : "ACTION",      // Clicking the button causes changes to the elements within the dialog.
+      HELP        : "HELP",        // The button can be clicked to request help.
+      YES         : "YES",         // The button is a "Yes"-like button.
+      NO          : "NO",          // The button is a "No"-like button.
+      APPLY       : "APPLY",       // The button applies current changes.
+      RESET       : "RESET",       // The button resets the dialog's fields to default values.}
 
-      SPACER: "SPACER" // Not a button.
+      SPACER      : "SPACER"       // Not a button.
     },
 
     standardButtons: {
-      OK: "OK_BUTTON", // An "OK" button defined with the AcceptRole.
-      OPEN: "OPEN_BUTTON", // An "Open" button defined with the AcceptRole.
-      SAVE: "SAVE_BUTTON", // A "Save" button defined with the AcceptRole.
-      CANCEL: "CANCEL_BUTTON", // A "Cancel" button defined with the RejectRole.
-      CLOSE: "CLOSE_BUTTON", // A "Close" button defined with the RejectRole.
-      DISCARD: "DISCARD_BUTTON", // A "Discard" or "Don't Save" button, depending on the platform, defined with the DestructiveRole.
-      APPLY: "APPLY_BUTTON", // An "Apply" button defined with the ApplyRole.
-      RESET: "RESET_BUTTON", // A "Reset" button defined with the ResetRole.
-      RESTOREDEFAULTS: "RESTOREDEFAULTS_BUTTON", // A "Restore Defaults" button defined with the ResetRole.
-      HELP: "HELP_BUTTON", // A "Help" button defined with the HelpRole.
-      SAVEALL: "SAVEALL_BUTTON", // A "Save All" button defined with the AcceptRole.
-      YES: "YES_BUTTON", // A "Yes" button defined with the YesRole.
-      YESTOALL: "YESTOALL_BUTTON", // A "Yes to All" button defined with the YesRole.
-      NO: "NO_BUTTON", //	A "No" button defined with the NoRole.
-      NOTOALL: "NOTOALL_BUTTON", // A "No to All" button defined with the NoRole.
-      ABORT: "ABORT_BUTTON", // An "Abort" button defined with the RejectRole.
-      RETRY: "RETRY_BUTTON", // A "Retry" button defined with the AcceptRole.
-      IGNORE: "IGNORE_BUTTON", // An "Ignore" button defined with the AcceptRole.
-      NOBUTTON: "NOBUTTON_BUTTON" //	An invalid button.
+      OK              : "OK_BUTTON",              // An "OK" button defined with the AcceptRole.
+      OPEN            : "OPEN_BUTTON",            // An "Open" button defined with the AcceptRole.
+      SAVE            : "SAVE_BUTTON",            // A "Save" button defined with the AcceptRole.
+      CANCEL          : "CANCEL_BUTTON",          // A "Cancel" button defined with the RejectRole.
+      CLOSE           : "CLOSE_BUTTON",           // A "Close" button defined with the RejectRole.
+      DISCARD         : "DISCARD_BUTTON",         // A "Discard" or "Don't Save" button, depending on the platform, defined with the DestructiveRole.
+      APPLY           : "APPLY_BUTTON",           // An "Apply" button defined with the ApplyRole.
+      RESET           : "RESET_BUTTON",           // A "Reset" button defined with the ResetRole.
+      RESTOREDEFAULTS : "RESTOREDEFAULTS_BUTTON", // A "Restore Defaults" button defined with the ResetRole.
+      HELP            : "HELP_BUTTON",            // A "Help" button defined with the HelpRole.
+      SAVEALL         : "SAVEALL_BUTTON",         // A "Save All" button defined with the AcceptRole.
+      YES             : "YES_BUTTON",             // A "Yes" button defined with the YesRole.
+      YESTOALL        : "YESTOALL_BUTTON",        // A "Yes to All" button defined with the YesRole.
+      NO              : "NO_BUTTON",              // A "No" button defined with the NoRole.
+      NOTOALL         : "NOTOALL_BUTTON",         // A "No to All" button defined with the NoRole.
+      ABORT           : "ABORT_BUTTON",           // An "Abort" button defined with the RejectRole.
+      RETRY           : "RETRY_BUTTON",           // A "Retry" button defined with the AcceptRole.
+      IGNORE          : "IGNORE_BUTTON",          // An "Ignore" button defined with the AcceptRole.
+      NOBUTTON        : "NOBUTTON_BUTTON"         // An invalid button.
     }
   },
 

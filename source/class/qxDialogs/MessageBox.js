@@ -1,3 +1,7 @@
+/**
+ * Message box can be used to inform, alert or ask the user.
+ *
+ */
 qx.Class.define("qxDialogs.MessageBox", {
   extend: qxDialogs.Dialog,
 
@@ -67,7 +71,7 @@ qx.Class.define("qxDialogs.MessageBox", {
     const content = this.getContentPane();
     content.setLayout(
       new qx.ui.layout.Atom().set({
-        center: true
+        // center: true
       })
     );
     content.setAppearance("qxdialogs-messagebox-content");
