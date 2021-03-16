@@ -37,11 +37,6 @@ qx.Class.define("qxDialogs.Dialog", {
     "clicked": "qx.event.type.Data",
 
     /**
-     * Emited when a button in this dialogs buttonBox is clicked
-     *
-     */
-
-    /**
      * Emmited when the color of the blocker changes
      *
      */

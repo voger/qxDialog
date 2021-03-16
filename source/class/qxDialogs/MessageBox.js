@@ -18,21 +18,37 @@ qx.Class.define("qxDialogs.MessageBox", {
     message: {
       check: "String",
       nullable: true,
-      event: "changMessage"
+      apply: "_applyMessage"
     },
 
     text: {
       check: "String",
       nullable: true,
-      event: "changeText"
+      apply: "_applyText"
     },
 
-    dialogIcon: {
+    messageIcon: {
       nullable: true,
       // check: qx.module.util.Object.getValues(this.contructor.type),
-      event: "changeDialogIcon",
-      apply: "_applyDialogIcon",
+      apply: "_applyMessageIcon",
       themeable: true
+    },
+
+    showIcon: {
+      nullable: true,
+      check: "Boolean",
+      apply: "_applyShowIcon"
+    },
+
+    type: {
+      nullable: false,
+      deferredInit: true,
+      apply: "_applyType"
+    },
+
+    appearance: {
+      refine: true,
+      init: "qxdialogs-messageBox"
     }
   },
 
@@ -52,39 +68,14 @@ qx.Class.define("qxDialogs.MessageBox", {
    */
   construct: function ({message: msg, text: txt}, sButtons = [], parent) {
     this.base(arguments, sButtons, parent);
+    const content = this.getContentPane();
+    content.setLayout(new qx.ui.layout.Atom());
+
     this.setMessage(msg);
     this.setText(txt);
+    this.setShowIcon(true);
 
-    // content
-    const message = (this.__msgLabel = new qx.ui.basic.Label());
-    message.setAppearance("qxdialogs-messagebox-message");
-    this.bind("message", message, "value");
-
-    this.bind("message", this, "caption");
-
-    const text = (this.__msgText = new qx.ui.basic.Label());
-    this.bind("text", text, "value");
-
-    const icon = (this.__dlgIcon = new qx.ui.basic.Image());
-    this.bind("dialogIcon", icon, "source");
-
-    const content = this.getContentPane();
-    content.setLayout(
-      new qx.ui.layout.Atom().set({
-        // center: true
-      })
-    );
-    content.setAppearance("qxdialogs-messagebox-content");
-
-    const strings = new qx.ui.container.Composite(new qx.ui.layout.VBox());
-    strings.add(message);
-    strings.add(text);
-    content.add(strings);
-
-    const dlgIcon = (this.__dlgIcon = new qx.ui.basic.Image());
-    dlgIcon.exclude();
-    dlgIcon.setAppearance("qxdialogs-messagebox-icon");
-    content.addAt(dlgIcon, 0);
+    content.setAppearance("qxdialogs-messageBox-content");
 
     // buttons
     const bBox = this.getButtonBox();
@@ -96,9 +87,44 @@ qx.Class.define("qxDialogs.MessageBox", {
   },
 
   members: {
-    __msgLabel: null,
-    __txtLabel: null,
-    __dlgIcon: null,
+    _createChildControlImpl(id) {
+      let control;
+
+      switch (id) {
+        case "strings":
+          // a container to hold the message
+          // and informative text
+          control = new qx.ui.container.Composite();
+          const layout = new qx.ui.layout.VBox();
+          control.setLayout(layout);
+
+          var contentPane = this.getContentPane();
+          contentPane.add(control);
+          break;
+        case "message":
+          // the message of the message box
+          control = new qx.ui.basic.Label();
+
+          var strings = this.getChildControl("strings", false);
+          strings.addAt(control, 0);
+          break;
+        case "text":
+          // informative text
+          control = new qx.ui.basic.Label();
+
+          var strings = this.getChildControl("strings", false);
+          strings.addAt(control, 1);
+          break;
+        case "messageIcon":
+          control = new qx.ui.basic.Image();
+
+          var contentPane = this.getContentPane();
+          contentPane.addAt(control, 0);
+          break;
+      }
+
+      return control || this.base(arguments, id);
+    },
 
     /**
      * Adds a button. Button can be:
@@ -113,19 +139,31 @@ qx.Class.define("qxDialogs.MessageBox", {
       this.getButtonBox().addButton(button, role);
     },
 
-    _applyDialogIcon: function (val, old) {
-      const dlgIcon = this.__dlgIcon;
+    _applyMessageIcon: function (val) {
+      const icon = this.getChildControl("messageIcon", false);
+      val ? icon.setSource(val) : icon.resetSource();
+    },
 
+    _applyShowIcon: function (val) {
+      const icon = this.getChildControl("messageIcon", false);
+      val ? icon.show() : icon.exclude();
+    },
+
+    _applyMessage: function (val) {
+      this.getChildControl("message", false).setValue(val);
+      this.setCaption(val);
+    },
+
+    _applyText: function (val) {
+      this.getChildControl("text", false).setValue(val);
+    },
+
+    _applyType(val, old) {
       if (old !== null) {
-        dlgIcon.revemoveState(old);
+        this.removeState(old);
       }
 
-      if (val !== null) {
-        dlgIcon.addState(val);
-        dlgIcon.show();
-      } else {
-        dlgIcon.exclude();
-      }
+      this.addState(val);
     },
 
     __onClicked: function (evt) {

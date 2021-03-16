@@ -7,7 +7,10 @@
    Authors: voger
 
 ************************************************************************ */
-
+/**
+ * @asset(qx/icon/Tango/48/status/dialog-information.png)
+ *
+ */
 qx.Theme.define("qxDialogs.theme.Appearance", {
   extend: qx.theme.indigo.Appearance,
 
@@ -23,26 +26,9 @@ qx.Theme.define("qxDialogs.theme.Appearance", {
       }
     },
 
-    "qxdialogs-messagebox-content": {
-      include: "widget",
-
-      style: function (_) {
-        return {
-          margin: [10, 20]
-        };
-      }
-    },
-
-    "qxdialogs-messagebox-message": {
-      style: function (_) {
-        return {
-          font: "bold"
-        };
-      }
-    },
-
-    "qxdialogs-messagebox-icon": {
-      include: "image",
+    "qxdialogs-messageBox": {
+      alias: "window",
+      include: "window",
 
       style: function (states) {
         let source;
@@ -62,10 +48,51 @@ qx.Theme.define("qxDialogs.theme.Appearance", {
         }
 
         return {
-          source: source,
-          paddingRight: 10
+          messageIcon: source
         };
       }
-    }
+    },
+
+    "qxdialogs-messageBox-content": {
+      include: "widget",
+
+      style: function (_) {
+        return {
+          margin: [10, 20]
+        };
+      }
+    },
+
+    "qxdialogs-messageBox/strings": {
+      include: "widget",
+      style: function (_) {
+        return {
+          paddingLeft: 10
+        };
+      }
+    },
+
+    "qxdialogs-messageBox/message": {
+      alias: "label",
+
+      style: function (_) {
+        return {
+          font: "bold",
+          marginBottom: 10
+        };
+      }
+    },
+
+    "qxdialogs-messageBox/text": {
+      alias: "label",
+
+      style: function (_) {
+        return {
+          marginBottom: 10
+        };
+      }
+    },
+
+    "qxDialogs-messageBox/messageIcon": "image"
   }
 });
