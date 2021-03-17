@@ -73,7 +73,8 @@ qx.Class.define("qxDialogs.demo.Application", {
         console.log("Finished: ", e.getData());
       });
 
-      dialog.setType("WARNING");
+      dialog.setType(qxDialogs.MessageBox.type.ERROR);
+      dialog.setWidth(500)
 
       const openDialog = new qx.ui.form.Button("Open MessageBox");
 

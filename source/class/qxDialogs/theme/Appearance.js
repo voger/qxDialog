@@ -33,15 +33,15 @@ qx.Theme.define("qxDialogs.theme.Appearance", {
       style: function (states) {
         let source;
 
-        if (states["ERROR"]) {
+        if (states[qxDialogs.MessageBox.type.ERROR]) {
           source = "qxDialogs.icon.error";
-        } else if (states["WARNING"]) {
+        } else if (states[qxDialogs.MessageBox.type.WARNING]) {
           source = "qxDialogs.icon.warning";
-        } else if (states["QUESTION"]) {
+        } else if (states[qxDialogs.MessageBox.type.QUESTION]) {
           source = "qxDialogs.icon.question";
-        } else if (states["SUCCESS"]) {
+        } else if (states[qxDialogs.MessageBox.type.SUCCESS]) {
           source = "qxDialogs.icon.success";
-        } else if (states["INFORMATION"]) {
+        } else if (states[qxDialogs.MessageBox.type.INFORMATION]) {
           source = "qxDialogs.icon.information";
         } else {
           source = null;

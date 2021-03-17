@@ -114,11 +114,6 @@ qx.Class.define("qxDialogs.Dialog", {
       init: "hidden"
     },
 
-    allowClose: {
-      refine: true,
-      init: false
-    },
-
     allowMinimize: {
       refine: true,
       init: false
@@ -155,10 +150,6 @@ qx.Class.define("qxDialogs.Dialog", {
     },
 
     resizableBottom: {
-      refine: true,
-      init: false
-    },
-    showClose: {
       refine: true,
       init: false
     },

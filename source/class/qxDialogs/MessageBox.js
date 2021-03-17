@@ -57,7 +57,8 @@ qx.Class.define("qxDialogs.MessageBox", {
       QUESTION: "QUESTION",
       INFORMATION: "INFORMATION",
       WARNING: "WARNING",
-      ERROR: "ERROR"
+      ERROR: "ERROR",
+      SUCCESS: "SUCCESS"
     }
   },
 
