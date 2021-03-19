@@ -55,16 +55,6 @@ qx.Class.define("qxDialogs.ButtonBox", {
     },
 
     /**
-     * Defult button
-     *
-     */
-    defaultButton: {
-      nullable: true,
-      check: "qx.ui.form.Button",
-      apply: "_applyDefaultButton"
-    },
-
-    /**
      * Minimum width for the buttons.
      * Used only in horizontal orientation.
      * Has no effect in vertical orientation.
@@ -85,11 +75,6 @@ qx.Class.define("qxDialogs.ButtonBox", {
       refine: true,
       init: true
     }
-
-    // focusable: {
-    //   refine: true,
-    //   init: false
-    // }
   },
 
   events: {
@@ -119,6 +104,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
   },
 
   statics: {
+    // prettier-ignore
     roles: {
       INVALID     : "INVALID",     // The button is invalid.
       ACCEPT      : "ACCEPT",      // Clicking the button causes the dialog to be accepted (e.g. OK).
@@ -134,13 +120,14 @@ qx.Class.define("qxDialogs.ButtonBox", {
       SPACER      : "SPACER"       // Not a button.
     },
 
+    // prettier-ignore
     standardButtons: {
       OK              : "OK_BUTTON",              // An "OK" button defined with the AcceptRole.
       OPEN            : "OPEN_BUTTON",            // An "Open" button defined with the AcceptRole.
       SAVE            : "SAVE_BUTTON",            // A "Save" button defined with the AcceptRole.
       CANCEL          : "CANCEL_BUTTON",          // A "Cancel" button defined with the RejectRole.
       CLOSE           : "CLOSE_BUTTON",           // A "Close" button defined with the RejectRole.
-      DISCARD         : "DISCARD_BUTTON",         // A "Discard" or "Don't Save" button, depending on the platform, defined with the DestructiveRole.
+      DISCARD         : "DISCARD_BUTTON",         // A "Discard" or "Don't Save" button, defined with the DestructiveRole.
       APPLY           : "APPLY_BUTTON",           // An "Apply" button defined with the ApplyRole.
       RESET           : "RESET_BUTTON",           // A "Reset" button defined with the ResetRole.
       RESTOREDEFAULTS : "RESTOREDEFAULTS_BUTTON", // A "Restore Defaults" button defined with the ResetRole.
@@ -170,21 +157,22 @@ qx.Class.define("qxDialogs.ButtonBox", {
 
     this.initOrientation(orientation);
     this.__createStandardButtons(buttonsArr);
-    this.setAnonymous(true);
+
+    // this.addListener("activate", this.__trackDefault, this, false);
+    // this.addListener("deactivate", this.__stopTrackingDefault, this, true);
   },
 
   members: {
-    _forwardStates: {
-      focused: true
-    },
-
     // contains all the buttons of this widget
     __buttonLists: null,
 
     // contains only the standard buttons
     __standardButtons: null,
 
+    // a string to act as selector for Appearance.js
     __defaultKey: this.constructor + ".default",
+
+    __assignedDefaultButton: null,
 
     /**
      * Adds a button. Button can be:
@@ -342,6 +330,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
     standardButton: function (button) {
       return this.__standardButtons.get(button) || this.constructor.NOBUTTON;
     },
+
     /**
      * Return button from standardButtons enum value or `undefined`
      * if no such button exist.
@@ -386,26 +375,19 @@ qx.Class.define("qxDialogs.ButtonBox", {
     /**
      * Sets a button as default.
      *
+     * @param button {qx.ui.form.Button} The button to set as default.
      * @throws {Error} when button is not a member of this widget.
-     * @param button {qx.ui.form.Button} The button to set as default
      *
      */
     setDefault: function (button) {
-      const buttons = this.buttons();
-
-      qx.core.Assert(
-        button,
-        buttons,
+      // prettier-ignore
+      qx.core.Assert.assertInArray(button, this.buttons(),
         `The given button is not included in this widget.
         Please add it first and then set it as default.`
       );
 
-      for (const member in buttons) {
-        this.unsetDefault(member);
-        if (button === member) {
-          member.setUserData(this.__defaultKey, true);
-        }
-      }
+      this.clearDefault();
+      button.addState(this.__defaultKey);
     },
 
     /**
@@ -415,19 +397,78 @@ qx.Class.define("qxDialogs.ButtonBox", {
      *
      */
     unsetDefault: function (button) {
-      button.setUserData(this.__defaultKey, false);
+      button.removeState(this.__defaultKey);
     },
 
     /**
-     * Return the default button or `undefined`
-     * if none is set
+     * Removes the default state from whichever button may have it.
+     * Doesn't affect the assigned default button set by <code>setAssignedDefault()</code>
+     * It may loose it's default state temporarely but still will be the fallback default
+     * button. You need to also call <code>setAssignedDefault(null)</code> to remove it as
+     * fallback default button.
      *
-     * @return {qx.ui.form.Button | undefined}
+     */
+    clearDefault: function () {
+      this.buttons().forEach((button) => {
+        this.unsetDefault(button);
+      });
+    },
+
+    /**
+     * Return the default button or <code>null</code> if none is set
+     *
+     * @return {qx.ui.form.Button | null}
      */
     getDefault: function () {
-      return this.buttons().find((elem) => {
-        elem.getUserData(this.__defaultKey);
+      const defaultButton = this.buttons().find((elem) => {
+        elem.hasState(this.__defaultKey);
       });
+
+      return defaultButton ?? null;
+    },
+
+    /**
+     * Set a button as default. This is the fallback button
+     * to be set as default when no other button of this widget
+     * has focus.
+     *
+     * @param button {qx.ui.form.Button|null} The button to set as default.
+     * @throws {Error} when button is not a member of this widget.
+     *
+     */
+    setAssignedDefault: function (button) {
+      if (!button) {
+        this.setDefault(button);
+      }
+
+      if (button instanceof qx.ui.form.Button) {
+        this.__assignedDefaultButton = button;
+      } else {
+        this.__assignedDefaultButton = null;
+      }
+    },
+
+    /**
+     * Returns the assigned default button or <code>null<null> if there is none.
+     * @return {qx.ui.form.Button|null} The assigned default button.
+     */
+    getAssignedDefaultButton: function () {
+      return this.__assignedDefaultButton;
+    },
+
+    __trackDefault: function (evt) {
+      const target = evt.getTarget();
+      console.log("Tracking default...", target.classname);
+      this.setDefault(target);
+    },
+
+    __stopTrackingDefault: function (evt) {
+      const assignedDefault = this.getAssignedDefaultButton();
+      if (assignedDefault) {
+        this.setDefault(assignedDefault);
+      } else {
+        this.clearDefault();
+      }
     },
 
     /**
@@ -440,7 +481,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
      */
     isDefault: function (button) {
       return (
-        button.getUserData(this.__defaultKey) && this.buttons().includes(button)
+        button.hasState(this.__defaultKey) && this.buttons().includes(button)
       );
     },
 
@@ -525,12 +566,6 @@ qx.Class.define("qxDialogs.ButtonBox", {
 
     _applyButtonsLayout: function () {
       this.__resetButtonsLayout();
-    },
-
-    _applyDefaultButton: function (val, old) {
-      const state = "defaultButton";
-      old && old.removeState(state);
-      val && val.addState(state);
     },
 
     __addButtons: function (buttonsArr) {

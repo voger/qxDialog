@@ -203,17 +203,27 @@ qx.Class.define("qxDialogs.Dialog", {
     const content = this.getContentPane();
     this.add(content, {edge: "north"});
 
-    this.__escCommand = new qx.ui.command.Command("Esc");
-    this.__escCommand.addListener("execute", this.reject, this);
+    const escCommand = new qx.ui.command.Command("Esc");
+    escCommand.addListener("execute", this.reject, this);
 
-    this.__enterCommand = new qx.ui.command.Command("Enter");
-    this.__enterCommand.addListener("execute", this.handleEnter, this);
+    const enterCommand = new qx.ui.command.Command("Enter");
+    enterCommand.addListener("execute", this.handleEnter, this);
+
+    const commandGroup = (this.__commandGroup = new qx.ui.command.Group());
+    commandGroup.add("enter", enterCommand);
+    commandGroup.add("esc", escCommand);
+    commandGroup.setActive(false);
+
+    this.addListener("activate", this._activateCommands, this);
+    this.addListener("deactivate", this._deactivateCommands, this);
 
     this.bind("blockerColor", this.__blocker, "color");
     this.bind("blockerOpacity", this.__blocker, "opacity");
 
     this.addListener("appear", this.__block, this);
     this.addListener("close", this.__unblock, this);
+    this.addListener(("activate"), function(e)  {
+      debugger; }, this)
   },
 
   members: {
@@ -221,8 +231,7 @@ qx.Class.define("qxDialogs.Dialog", {
     __result: null,
     __bBox: null,
     __content: null,
-    __escCommand: null,
-    __enterCommand: null,
+    __commandGroup: null,
 
     /**
      * Returns the buttons container
@@ -325,6 +334,14 @@ qx.Class.define("qxDialogs.Dialog", {
       const bBox = this.getButtonBox();
       this.remove(bBox);
       this.add(bBox, {edge: this.__buttonBoxPosition()});
+    },
+
+    _activateCommands: function () {
+      this.__commandGroup.setActive(true);
+    },
+
+    _deactivateCommands: function() {
+      this.__commandGroup.setActive(false);
     },
 
     __block: function () {

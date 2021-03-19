@@ -64,6 +64,7 @@ qx.Class.define("qxDialogs.demo.Application", {
       const dialog = new qxDialogs.MessageBox(message, standardButtons);
 
       dialog.setModal(false);
+      dialog.getButtonBox().setAssignedDefault(buttonsEnum.NO);
 
       dialog.addListener("clicked", (e) => {
         console.log("Clicked: ", e.getData().getLabel());
@@ -74,7 +75,7 @@ qx.Class.define("qxDialogs.demo.Application", {
       });
 
       dialog.setType(qxDialogs.MessageBox.type.ERROR);
-      dialog.setWidth(500)
+      dialog.setWidth(500);
 
       const openDialog = new qx.ui.form.Button("Open MessageBox");
 
