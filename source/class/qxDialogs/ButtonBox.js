@@ -66,6 +66,18 @@ qx.Class.define("qxDialogs.ButtonBox", {
       apply: "_applyButtonMinWidth"
     },
 
+    /**
+     * Default button
+     *
+     */
+    defaultButton: {
+      nullable: true,
+      check: function (val) {
+        return this.buttons().includes(val);
+      },
+      apply: "_applyDefaultButton"
+    },
+
     allowGrowX: {
       refine: true,
       init: true
@@ -157,9 +169,6 @@ qx.Class.define("qxDialogs.ButtonBox", {
 
     this.initOrientation(orientation);
     this.__createStandardButtons(buttonsArr);
-
-    // this.addListener("activate", this.__trackDefault, this, false);
-    // this.addListener("deactivate", this.__stopTrackingDefault, this, true);
   },
 
   members: {
@@ -254,8 +263,8 @@ qx.Class.define("qxDialogs.ButtonBox", {
     },
 
     /**
-     * Removes a button. Returns true if the button is found
-     * in the internal list, undefined otherwise.
+     * Removes a button. Returns the button it is found
+     * in the internal list, false otherwise.
      * Regarding standard buttons: Because the calling code is
      * responsible for their creation, it is also responsible for
      * their disposal as it would do with any other non-standard
@@ -373,58 +382,13 @@ qx.Class.define("qxDialogs.ButtonBox", {
     },
 
     /**
-     * Sets a button as default.
-     *
-     * @param button {qx.ui.form.Button} The button to set as default.
-     * @throws {Error} when button is not a member of this widget.
-     *
+     * Resets the default button to the assigned default.
+     * If the assigned default is <code>null</code> then
+     * there is no default button.
      */
-    setDefault: function (button) {
-      // prettier-ignore
-      qx.core.Assert.assertInArray(button, this.buttons(),
-        `The given button is not included in this widget.
-        Please add it first and then set it as default.`
-      );
-
-      this.clearDefault();
-      button.addState(this.__defaultKey);
-    },
-
-    /**
-     * Button is no longer marked as default
-     *
-     * @param button {qx.ui.form.Button}
-     *
-     */
-    unsetDefault: function (button) {
-      button.removeState(this.__defaultKey);
-    },
-
-    /**
-     * Removes the default state from whichever button may have it.
-     * Doesn't affect the assigned default button set by <code>setAssignedDefault()</code>
-     * It may loose it's default state temporarely but still will be the fallback default
-     * button. You need to also call <code>setAssignedDefault(null)</code> to remove it as
-     * fallback default button.
-     *
-     */
-    clearDefault: function () {
-      this.buttons().forEach((button) => {
-        this.unsetDefault(button);
-      });
-    },
-
-    /**
-     * Return the default button or <code>null</code> if none is set
-     *
-     * @return {qx.ui.form.Button | null}
-     */
-    getDefault: function () {
-      const defaultButton = this.buttons().find((elem) => {
-        elem.hasState(this.__defaultKey);
-      });
-
-      return defaultButton ?? null;
+    resetDefaultButton: function () {
+      console.log("Resetting default..");
+      this.setDefaultButton(this.getAssignedDefaultButton());
     },
 
     /**
@@ -437,15 +401,20 @@ qx.Class.define("qxDialogs.ButtonBox", {
      *
      */
     setAssignedDefault: function (button) {
-      if (!button) {
-        this.setDefault(button);
+      let tmpButton;
+
+      if (qx.lang.Type.isString(button)) {
+        tmpButton = this.fromStandardButton(button);
+      } else if (button === null || this.includes(button)) {
+        tmpButton = button;
+      } else {
+        throw new qx.core.AssertionError(
+          "NOT INCLUDED",
+          `Cannot assign ${button} as default. Please ensure that it is a qx.ui.form.Button and it is included in this ${this.constructor.classname}`
+        );
       }
 
-      if (button instanceof qx.ui.form.Button) {
-        this.__assignedDefaultButton = button;
-      } else {
-        this.__assignedDefaultButton = null;
-      }
+      this.__assignedDefaultButton = tmpButton;
     },
 
     /**
@@ -454,35 +423,6 @@ qx.Class.define("qxDialogs.ButtonBox", {
      */
     getAssignedDefaultButton: function () {
       return this.__assignedDefaultButton;
-    },
-
-    __trackDefault: function (evt) {
-      const target = evt.getTarget();
-      console.log("Tracking default...", target.classname);
-      this.setDefault(target);
-    },
-
-    __stopTrackingDefault: function (evt) {
-      const assignedDefault = this.getAssignedDefaultButton();
-      if (assignedDefault) {
-        this.setDefault(assignedDefault);
-      } else {
-        this.clearDefault();
-      }
-    },
-
-    /**
-     * Determine if button is default for this widget.
-     * Returns `false` if the button is not a member
-     * of this widget or if it is not set as default.
-     *
-     * @param button {qx.ui.form.Button} Button to check.
-     * @return {Boolean} Whether the button is default.
-     */
-    isDefault: function (button) {
-      return (
-        button.hasState(this.__defaultKey) && this.buttons().includes(button)
-      );
     },
 
     layoutButtons: function () {
@@ -524,6 +464,17 @@ qx.Class.define("qxDialogs.ButtonBox", {
       }
     },
 
+    /**
+     * Whether the button is included in this widget.
+     *
+     * @param button {qx.ui.form.Button} The button to test
+     * @return {Boolean} whether is included or not.
+     *
+     */
+    includes: function (button) {
+      return this.buttons().includes(button);
+    },
+
     _applyCenter: function (val) {
       this.__resetButtonsLayout();
     },
@@ -531,6 +482,11 @@ qx.Class.define("qxDialogs.ButtonBox", {
     _applyButtonsDistance: function (val) {
       const layout = this.getLayout();
       layout.setSpacing(val);
+    },
+
+    _applyDefaultButton: function (val, old) {
+      old?.removeState(this.__defaultKey);
+      val?.addState(this?.__defaultKey);
     },
 
     _applyButtonMinWidth: function (val) {

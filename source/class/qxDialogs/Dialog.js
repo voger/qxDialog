@@ -215,6 +215,7 @@ qx.Class.define("qxDialogs.Dialog", {
     commandGroup.setActive(false);
 
     this.addListener("activate", this._activateCommands, this);
+    this.addListener("activate", this.__trackDefault, this);
     this.addListener("deactivate", this._deactivateCommands, this);
 
     this.bind("blockerColor", this.__blocker, "color");
@@ -222,8 +223,7 @@ qx.Class.define("qxDialogs.Dialog", {
 
     this.addListener("appear", this.__block, this);
     this.addListener("close", this.__unblock, this);
-    this.addListener(("activate"), function(e)  {
-      debugger; }, this)
+
   },
 
   members: {
@@ -288,11 +288,8 @@ qx.Class.define("qxDialogs.Dialog", {
     },
 
     handleEnter: function () {
-      const defaultButton = this.getButtonBox().getDefault();
-
-      if (defaultButton) {
-        defaultButton.execute();
-      }
+      const defaultButton = this.getButtonBox().getDefaultButton();
+      defaultButton?.execute()
     },
 
     unsetDefaultButton: function (button) {
@@ -340,7 +337,7 @@ qx.Class.define("qxDialogs.Dialog", {
       this.__commandGroup.setActive(true);
     },
 
-    _deactivateCommands: function() {
+    _deactivateCommands: function () {
       this.__commandGroup.setActive(false);
     },
 
@@ -352,6 +349,17 @@ qx.Class.define("qxDialogs.Dialog", {
 
     __unblock: function () {
       this.__blocker.unblock();
+    },
+
+    __trackDefault: function (evt) {
+      const target = evt.getTarget();
+      const bBox = this.getButtonBox();
+
+      if (bBox.buttons().includes(target)) {
+        bBox.setDefaultButton(target);
+      } else {
+        bBox.resetDefaultButton();
+      }
     },
 
     // helper function to calculate the buttonBox edge
