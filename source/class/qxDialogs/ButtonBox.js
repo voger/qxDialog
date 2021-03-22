@@ -178,8 +178,6 @@ qx.Class.define("qxDialogs.ButtonBox", {
     // contains only the standard buttons
     __standardButtons: null,
 
-    // a string to act as selector for Appearance.js
-    __defaultKey: this.constructor + ".default",
 
     __assignedDefaultButton: null,
 
@@ -229,6 +227,8 @@ qx.Class.define("qxDialogs.ButtonBox", {
       if (this.getLayout() instanceof qx.ui.layout.HBox) {
         button.setMinWidth(this.getButtonMinWidth());
       }
+
+      button.setAppearance("qxDialogs-dialogbox-button");
 
       const roleArray = this.__buttonLists.get(role);
       roleArray.push(button);
@@ -485,8 +485,8 @@ qx.Class.define("qxDialogs.ButtonBox", {
     },
 
     _applyDefaultButton: function (val, old) {
-      old?.removeState(this.__defaultKey);
-      val?.addState(this?.__defaultKey);
+      old?.removeState("focused");
+      val?.addState("focused");
     },
 
     _applyButtonMinWidth: function (val) {
