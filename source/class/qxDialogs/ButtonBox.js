@@ -228,8 +228,6 @@ qx.Class.define("qxDialogs.ButtonBox", {
         button.setMinWidth(this.getButtonMinWidth());
       }
 
-      button.setAppearance("qxDialogs-dialogbox-button");
-
       const roleArray = this.__buttonLists.get(role);
       roleArray.push(button);
       return button;

@@ -93,21 +93,6 @@ qx.Theme.define("qxDialogs.theme.Appearance", {
       }
     },
 
-    "qxDialogs-messageBox/messageIcon": "image",
-
-    "qxDialogs-dialogbox-button": {
-      alias: "button",
-      include: "button",
-
-      style: function (states, {decorator}) {
-        const changedDecorator = states["qxDialogs-buttonBox-default"]
-          ? decorator + "-default"
-          : decorator;
-
-        return {
-          decorator: changedDecorator
-        };
-      }
-    }
+    "qxDialogs-messageBox/messageIcon": "image"
   }
 });
