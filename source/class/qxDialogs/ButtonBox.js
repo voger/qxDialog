@@ -72,6 +72,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
      */
     defaultButton: {
       nullable: true,
+      init: null,
       check: function (val) {
         return this.buttons().includes(val);
       },
@@ -152,7 +153,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
       ABORT           : "ABORT_BUTTON",           // An "Abort" button defined with the RejectRole.
       RETRY           : "RETRY_BUTTON",           // A "Retry" button defined with the AcceptRole.
       IGNORE          : "IGNORE_BUTTON",          // An "Ignore" button defined with the AcceptRole.
-      NOBUTTON        : "NOBUTTON_BUTTON"         // An invalid button.
+      NOBUTTON        : null                      // An invalid button.
     }
   },
 
@@ -177,7 +178,6 @@ qx.Class.define("qxDialogs.ButtonBox", {
 
     // contains only the standard buttons
     __standardButtons: null,
-
 
     __assignedDefaultButton: null,
 
@@ -394,25 +394,33 @@ qx.Class.define("qxDialogs.ButtonBox", {
      * to be set as default when no other button of this widget
      * has focus.
      *
-     * @param button {qx.ui.form.Button|null} The button to set as default.
+     * @param button {qx.ui.form.Button|qxDialogs.ButtonBox.standardButtons|null} The button to set as default.
      * @throws {Error} when button is not a member of this widget.
      *
      */
     setAssignedDefault: function (button) {
-      let tmpButton;
-
       if (qx.lang.Type.isString(button)) {
-        tmpButton = this.fromStandardButton(button);
-      } else if (button === null || this.includes(button)) {
-        tmpButton = button;
-      } else {
-        throw new qx.core.AssertionError(
-          "NOT INCLUDED",
-          `Cannot assign ${button} as default. Please ensure that it is a qx.ui.form.Button and it is included in this ${this.constructor.classname}`
-        );
+        const tmpButton = this.fromStandardButton(button);
+        if (this.includes(tmpButton)) {
+          this.__assignedDefaultButton = tmpButton;
+          return;
+        }
       }
 
-      this.__assignedDefaultButton = tmpButton;
+      if (button === null) {
+        this.__assignedDefaultButton = button;
+        return;
+      }
+
+      if (this.includes(button)) {
+        this.__assignedDefaultButton = button;
+        return;
+      }
+
+      throw new qx.core.AssertionError(
+        "NOT INCLUDED",
+        `Cannot assign ${button} as default. Please ensure that it is a qx.ui.form.Button and it is included in this ${this.constructor.classname}`
+      );
     },
 
     /**
@@ -420,12 +428,13 @@ qx.Class.define("qxDialogs.ButtonBox", {
      * @return {qx.ui.form.Button|null} The assigned default button.
      */
     getAssignedDefaultButton: function () {
-      return this.__assignedDefaultButton;
+      // ensure this method never returns undefined
+      return this.__assignedDefaultButton || null;
     },
 
     layoutButtons: function () {
       if (this.getCenter()) {
-        this.add(new qx.ui.core.Spacer());
+        this.add(new qx.ui.core.Spacer(), {flex: 2});
       }
 
       const roles = this.constructor.roles;
@@ -452,13 +461,14 @@ qx.Class.define("qxDialogs.ButtonBox", {
           case roles.NO:
           case roles.APPLY:
           case roles.RESET:
+          case roles.REJECT:
             const buttonsArr = this.__buttonLists.get(role);
             this.__addButtons(buttonsArr);
         }
       }
 
       if (this.getCenter()) {
-        this.add(new qx.ui.core.Spacer());
+        this.add(new qx.ui.core.Spacer(), {flex: 2});
       }
     },
 

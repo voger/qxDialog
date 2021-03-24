@@ -59,6 +59,16 @@ qx.Class.define("qxDialogs.MessageBox", {
       WARNING: "WARNING",
       ERROR: "ERROR",
       SUCCESS: "SUCCESS"
+    },
+
+    // prettier-ignore
+    critical: function (parent, title, message, text, 
+      buttons = [qxDialogs.ButtonBox.standardButtons.CLOSE]) {
+      return new this.constructor(parent, title, message, text, buttons).set({
+        type: qxDialogs.MessageBox.type.ERROR,
+        width: 500,
+        centerButtons: true
+      });
     }
   },
 
@@ -67,13 +77,14 @@ qx.Class.define("qxDialogs.MessageBox", {
    * Message is the informative message
    * Buttons is an array of default buttons
    */
-  construct: function ({message: msg, text: txt}, sButtons = [], parent) {
-    this.base(arguments, sButtons, parent);
+  construct: function (parent, title, message, text, sButtons = []) {
+    this.base(arguments, parent, sButtons);
     const content = this.getContentPane();
     content.setLayout(new qx.ui.layout.Atom());
 
-    this.setMessage(msg);
-    this.setText(txt);
+    this.setCaption(title);
+    this.setMessage(message);
+    this.setText(text);
     this.setShowIcon(true);
 
     content.setAppearance("qxdialogs-messageBox-content");
@@ -152,7 +163,6 @@ qx.Class.define("qxDialogs.MessageBox", {
 
     _applyMessage: function (val) {
       this.getChildControl("message", false).setValue(val);
-      this.setCaption(val);
     },
 
     _applyText: function (val) {

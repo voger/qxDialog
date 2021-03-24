@@ -88,6 +88,13 @@ qx.Class.define("qxDialogs.Dialog", {
       event: "changeBlockerOpacity"
     },
 
+    centerButtons: {
+      check: "Boolean",
+      nullable: false,
+      init: true,
+      event: "changeCenterButtons"
+    },
+
     /**
      * The parent widget. Defaults to application root
      *
@@ -99,16 +106,6 @@ qx.Class.define("qxDialogs.Dialog", {
     },
 
     // overrides
-    centerOnAppear: {
-      refine: true,
-      init: true
-    },
-
-    centerOnContainerResize: {
-      refine: true,
-      init: true
-    },
-
     visibility: {
       refine: true,
       init: "hidden"
@@ -177,8 +174,13 @@ qx.Class.define("qxDialogs.Dialog", {
     }
   },
 
-  construct: function (sButtons = [], parent) {
+  construct: function (parent, sButtons = []) {
     this.base(arguments);
+
+    this.set({
+      centerOnAppear: true,
+      centerOnContainerResize: true
+    });
 
     const dockLayout = new qx.ui.layout.Dock();
     dockLayout.setSort("x");
@@ -223,7 +225,6 @@ qx.Class.define("qxDialogs.Dialog", {
 
     this.addListener("appear", this.__block, this);
     this.addListener("close", this.__unblock, this);
-
   },
 
   members: {
@@ -244,6 +245,7 @@ qx.Class.define("qxDialogs.Dialog", {
 
       const bBox = (this.__bBox = new qxDialogs.ButtonBox());
       this.bind("orientation", bBox, "orientation");
+      this.bind("centerButtons", bBox, "center");
       return bBox;
     },
 
@@ -289,7 +291,7 @@ qx.Class.define("qxDialogs.Dialog", {
 
     handleEnter: function () {
       const defaultButton = this.getButtonBox().getDefaultButton();
-      defaultButton?.execute()
+      defaultButton?.execute();
     },
 
     unsetDefaultButton: function (button) {

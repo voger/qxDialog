@@ -61,10 +61,11 @@ qx.Class.define("qxDialogs.demo.Application", {
         text: "It works. Aren't you happy?"
       };
 
-      const dialog = new qxDialogs.MessageBox(message, standardButtons);
+
+      const dialog = qxDialogs.MessageBox.critical(null, message.message, message.message, message.text, undefined);
 
       dialog.setModal(false);
-      dialog.getButtonBox().setAssignedDefault(buttonsEnum.NO);
+      dialog.getButtonBox().setAssignedDefault(buttonsEnum.NOBUTTON);
 
       dialog.addListener("clicked", (e) => {
         console.log("Clicked: ", e.getData().getLabel());
@@ -74,8 +75,6 @@ qx.Class.define("qxDialogs.demo.Application", {
         console.log("Finished: ", e.getData());
       });
 
-      dialog.setType(qxDialogs.MessageBox.type.ERROR);
-      dialog.setWidth(500);
 
       const openDialog = new qx.ui.form.Button("Open MessageBox");
 
