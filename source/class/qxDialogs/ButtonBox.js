@@ -306,8 +306,8 @@ qx.Class.define("qxDialogs.ButtonBox", {
     buttons: function () {
       let buttons = [];
 
-      for (const value of this.__buttonLists.values()) {
-        buttons = buttons.concat(value);
+      for (const roleMembers of this.__buttonLists.values()) {
+        buttons = buttons.concat(roleMembers);
       }
 
       // ensure unique elements
@@ -356,7 +356,8 @@ qx.Class.define("qxDialogs.ButtonBox", {
      * @return {String} the role
      */
     buttonRole: function (button) {
-      for (const [role, buttons] of this.__buttonLists.entries()) {
+      debugger;
+      for (const [role, buttons] of this.__buttonLists) {
         if (buttons.includes(button)) {
           return role;
         }
