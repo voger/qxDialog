@@ -183,32 +183,17 @@ qx.Class.define("qxDialogs.ButtonBox", {
 
     /**
      * Adds a button. Button can be:
-     * * {String} In this case a new qx.ui.form.Button is created and the
-     *            string serves as it's label.
-     *
      *
      * @param button  The button to be added
      * @param role {qxDialog.ButtonBox.roles} one of the ButtonBox roles
      */
     addButton: function (button, role) {
-      if (button instanceof qx.ui.form.Button) {
-        // if button is already a button object just add it
-        this.__addButton(button, role);
-      } else if (
-        qx.lang.Object.contains(this.constructor.standardButtons, button)
-      ) {
-        // if `button` is one of the values of the standardButtons enum
-        // then create the button and assign to it it's standard role
-        // The `role` method param is ignored. Standard buttons have
-        // predefined roles.
-        this.__createStandardButton(button);
-      }
-
+      this.__addButton(button, role);
       this.__resetButtonsLayout();
     },
 
     /**
-     * Creates and adds standard buttons to the widget
+     * Creates and adds standard buttons to the widget.
      * @param sButtons {Array} array of the standard buttons
      *                         to be created
      */
@@ -230,7 +215,6 @@ qx.Class.define("qxDialogs.ButtonBox", {
 
       const roleArray = this.__buttonLists.get(role);
       roleArray.push(button);
-      return button;
     },
 
     /**
@@ -251,22 +235,23 @@ qx.Class.define("qxDialogs.ButtonBox", {
       this.__standardButtons.set(button, sButton);
       const role = this.__buttonRole(sButton);
 
-      this.__addButton(button, role);
+      this.addButton(button, role);
     },
 
     __createStandardButtons: function (buttonsArr) {
-      for (const standardButton of buttonsArr) {
-        this.addButton(standardButton);
-      }
+      buttonsArr.forEach(this.__createStandardButton, this);
     },
 
     /**
      * Removes a button. Returns the button it is found
      * in the internal list, false otherwise.
+     *
      * Regarding standard buttons: Because the calling code is
      * responsible for their creation, it is also responsible for
      * their disposal as it would do with any other non-standard
-     * buttons added to this widget.
+     * buttons added to this widget. If this widget is disposed,
+     * it disposes all the child buttons with it. If any button is
+     * removed, it must be disposed somwhere else.
      *
      * @param button {qx.ui.form.Button}
      *
@@ -283,6 +268,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
         }
       }
 
+      // remove from layout children also
       this.remove(button);
       return isRemoved ? button : undefined;
     },
@@ -385,7 +371,6 @@ qx.Class.define("qxDialogs.ButtonBox", {
      * there is no default button.
      */
     resetDefaultButton: function () {
-      console.log("Resetting default..");
       this.setDefaultButton(this.getAssignedDefaultButton());
     },
 
@@ -438,8 +423,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
       }
 
       const roles = this.constructor.roles;
-      const buttonsLayout = (this.getButtonsLayout() ||
-        this._defaultButtonsLayout())[this.getOrientation()];
+      const buttonsLayout = (this.getButtonsLayout() || this._defaultButtonsLayout())[this.getOrientation()];
 
       for (const role of buttonsLayout) {
         switch (role) {
