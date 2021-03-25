@@ -62,7 +62,7 @@ qx.Class.define("qxDialogs.demo.Application", {
       };
 
 
-      const dialog = qxDialogs.MessageBox.critical(null, message.message, message.message, message.text, undefined);
+      const dialog = qxDialogs.MessageBox.question(null, message.message, message.message, message.text, undefined);
 
       dialog.setModal(false);
       dialog.getButtonBox().setAssignedDefault(buttonsEnum.NOBUTTON);

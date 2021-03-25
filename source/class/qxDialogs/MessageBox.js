@@ -61,11 +61,40 @@ qx.Class.define("qxDialogs.MessageBox", {
       SUCCESS: "SUCCESS"
     },
 
-    // prettier-ignore
-    critical: function (parent, title, message, text, 
-      buttons = [qxDialogs.ButtonBox.standardButtons.CLOSE]) {
+    critical: function (parent, title, message, text, buttons = [qxDialogs.ButtonBox.standardButtons.CLOSE]) {
       return new this.constructor(parent, title, message, text, buttons).set({
         type: qxDialogs.MessageBox.type.ERROR,
+        width: 500,
+        centerButtons: true
+      });
+    },
+
+    info: function (parent, title, message, text, buttons = [qxDialogs.ButtonBox.standardButtons.CLOSE]) {
+      return new this.constructor(parent, title, message, text, buttons).set({
+        type: qxDialogs.MessageBox.type.INFORMATION,
+        width: 500,
+        centerButtons: true
+      });
+    },
+
+    warning: function (parent, title, message, text, buttons = [qxDialogs.ButtonBox.standardButtons.CLOSE]) {
+      return new this.constructor(parent, title, message, text, buttons).set({
+        type: qxDialogs.MessageBox.type.WARNING,
+        width: 500,
+        centerButtons: true
+      });
+    },
+    success: function (parent, title, message, text, buttons = [qxDialogs.ButtonBox.standardButtons.CLOSE]) {
+      return new this.constructor(parent, title, message, text, buttons).set({
+        type: qxDialogs.MessageBox.type.SUCCESS,
+        width: 500,
+        centerButtons: true
+      });
+    },
+
+    question: function (parent, title, message, text, buttons = [qxDialogs.ButtonBox.standardButtons.YES, qxDialogs.ButtonBox.standardButtons.NO]) {
+      return new this.constructor(parent, title, message, text, buttons).set({
+        type: qxDialogs.MessageBox.type.QUESTION,
         width: 500,
         centerButtons: true
       });
