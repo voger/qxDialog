@@ -64,7 +64,6 @@ qx.Class.define("qxDialogs.MessageBox", {
     critical: function (parent, title, message, text, buttons = [qxDialogs.ButtonBox.standardButtons.CLOSE]) {
       return new this.constructor(parent, title, message, text, buttons).set({
         type: qxDialogs.MessageBox.type.ERROR,
-        width: 500,
         centerButtons: true
       });
     },
@@ -72,7 +71,6 @@ qx.Class.define("qxDialogs.MessageBox", {
     info: function (parent, title, message, text, buttons = [qxDialogs.ButtonBox.standardButtons.CLOSE]) {
       return new this.constructor(parent, title, message, text, buttons).set({
         type: qxDialogs.MessageBox.type.INFORMATION,
-        width: 500,
         centerButtons: true
       });
     },
@@ -80,14 +78,12 @@ qx.Class.define("qxDialogs.MessageBox", {
     warning: function (parent, title, message, text, buttons = [qxDialogs.ButtonBox.standardButtons.CLOSE]) {
       return new this.constructor(parent, title, message, text, buttons).set({
         type: qxDialogs.MessageBox.type.WARNING,
-        width: 500,
         centerButtons: true
       });
     },
     success: function (parent, title, message, text, buttons = [qxDialogs.ButtonBox.standardButtons.CLOSE]) {
       return new this.constructor(parent, title, message, text, buttons).set({
         type: qxDialogs.MessageBox.type.SUCCESS,
-        width: 500,
         centerButtons: true
       });
     },
@@ -95,7 +91,6 @@ qx.Class.define("qxDialogs.MessageBox", {
     question: function (parent, title, message, text, buttons = [qxDialogs.ButtonBox.standardButtons.YES, qxDialogs.ButtonBox.standardButtons.NO]) {
       return new this.constructor(parent, title, message, text, buttons).set({
         type: qxDialogs.MessageBox.type.QUESTION,
-        width: 500,
         centerButtons: true
       });
     }
@@ -132,36 +127,40 @@ qx.Class.define("qxDialogs.MessageBox", {
       let control;
 
       switch (id) {
-        case "strings":
+        case "strings": {
           // a container to hold the message
           // and informative text
           control = new qx.ui.container.Composite();
           const layout = new qx.ui.layout.VBox();
           control.setLayout(layout);
 
-          var contentPane = this.getContentPane();
+          const contentPane = this.getContentPane();
           contentPane.add(control);
           break;
-        case "message":
+        }
+        case "message": {
           // the message of the message box
           control = new qx.ui.basic.Label();
 
-          var strings = this.getChildControl("strings", false);
+          const strings = this.getChildControl("strings", false);
           strings.addAt(control, 0);
           break;
-        case "text":
+        }
+        case "text": {
           // informative text
           control = new qx.ui.basic.Label();
 
-          var strings = this.getChildControl("strings", false);
+          const strings = this.getChildControl("strings", false);
           strings.addAt(control, 1);
           break;
-        case "messageIcon":
+        }
+        case "messageIcon": {
           control = new qx.ui.basic.Image();
 
-          var contentPane = this.getContentPane();
+          const contentPane = this.getContentPane();
           contentPane.addAt(control, 0);
           break;
+        }
       }
 
       return control || this.base(arguments, id);

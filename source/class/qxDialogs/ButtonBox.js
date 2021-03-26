@@ -356,7 +356,6 @@ qx.Class.define("qxDialogs.ButtonBox", {
      * @return {String} the role
      */
     buttonRole: function (button) {
-      debugger;
       for (const [role, buttons] of this.__buttonLists) {
         if (buttons.includes(button)) {
           return role;
@@ -433,12 +432,13 @@ qx.Class.define("qxDialogs.ButtonBox", {
               this.add(new qx.ui.core.Spacer(), {flex: 1});
             }
             break;
-          case roles.ACCEPT:
+          case roles.ACCEPT: {
             // only add the first button
             const button = this.__buttonLists.get(role)[0];
             button && this.add(button);
 
             break;
+          }
           case roles.DESTRUCTIVE:
           case roles.ACTION:
           case roles.HELP:
@@ -446,9 +446,10 @@ qx.Class.define("qxDialogs.ButtonBox", {
           case roles.NO:
           case roles.APPLY:
           case roles.RESET:
-          case roles.REJECT:
+          case roles.REJECT: {
             const buttonsArr = this.__buttonLists.get(role);
             this.__addButtons(buttonsArr);
+          }
         }
       }
 
@@ -468,7 +469,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
       return this.buttons().includes(button);
     },
 
-    _applyCenter: function (val) {
+    _applyCenter: function () {
       this.__resetButtonsLayout();
     },
 
@@ -483,19 +484,15 @@ qx.Class.define("qxDialogs.ButtonBox", {
     },
 
     _applyButtonMinWidth: function (val) {
-      const layout = this.getLayout();
       const minWidth = this.getOrientation() === "horizontal" ? val : null;
 
-      const buttons = this.buttons();
-
-      for (const button of buttons) {
+      this.buttons().forEach((button) => {
         button.setMinWidth(minWidth);
-      }
+      });
     },
 
     _applyOrientation: function (val) {
       const oldLayout = this.getLayout();
-      let newLayout;
 
       const buttonsDistance = this.getButtonsDistance();
 

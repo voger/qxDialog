@@ -48,7 +48,8 @@ qx.Theme.define("qxDialogs.theme.Appearance", {
         }
 
         return {
-          messageIcon: source
+          messageIcon: source,
+          minWidth: 500
         };
       }
     },
