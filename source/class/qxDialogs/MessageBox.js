@@ -97,19 +97,26 @@ qx.Class.define("qxDialogs.MessageBox", {
   },
 
   /**
-   * Text is the informative text
-   * Message is the informative message
-   * Buttons is an array of default buttons
+   * Construct a new MessageBox.
+   *
+   * @param parent {qx.ui.core.Widget} Any widget that can contain a window.
+   * @param title {String} The title of the dialog.
+   * @param message {String} The message.
+   * @param text {String} An informative text.
+   * @param buttons {Array} An array of buttons. Each item can be one of the
+   *                        enum values of qxDialogs.ButtonBox.standardButtons.
    */
   construct: function (parent, title, message, text, sButtons = []) {
     this.base(arguments, parent, sButtons);
     const content = this.getContentPane();
     content.setLayout(new qx.ui.layout.Atom());
 
-    this.setCaption(title);
-    this.setMessage(message);
-    this.setText(text);
-    this.setShowIcon(true);
+    this.set({
+      caption: title,
+      message: message,
+      text: text,
+      showIcon: true
+    });
 
     content.setAppearance("qxdialogs-messageBox-content");
 

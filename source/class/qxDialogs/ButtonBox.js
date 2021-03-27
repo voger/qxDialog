@@ -352,7 +352,7 @@ qx.Class.define("qxDialogs.ButtonBox", {
     /**
      * Return role for button
      *
-     * @param {qx.ui.form.Button} The button for which we seek the role
+     * @param The {qx.ui.form.Button} button for which we seek the role
      * @return {String} the role
      */
     buttonRole: function (button) {
